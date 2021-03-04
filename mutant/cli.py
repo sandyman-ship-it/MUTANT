@@ -41,13 +41,13 @@ def sarscov2(ctx, input_folder, config_case, outdir):
         #Generate prefix dynamically from config-case
         pass
 
-    cmd = 'nextflow run {0}/externals/ncov2019-artic-nf/main.nf -profile singularity --illumina --prefix "{1}" --directory {2} --outdir {3}'\
+    cmd = 'nextflow run {0}/externals/ncov2019-artic-nf/main.nf -profile conda --illumina --prefix "{1}" --directory {2} --outdir {3}'\
             .format(WD, prefix, input_folder, outdir)
     log.debug("Command ran: {}".format(cmd))
-    proc = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
-    log.info(out)
-    log.info(err)
+    #log.info(out)
+    #log.info(err)
 
 
 @analyse.command()
