@@ -59,3 +59,13 @@ def jasen(ctx):
 @click.pass_context
 def toolbox(ctx):
     pass
+
+@toolbox.command()
+@click.argument("input_folder")
+@click.argument("ticket_number")
+def ArticReport(input_folder, ticket_number):
+    """ Custom report from the QC output of the ARTIC pipeline, applied on SARS-CoV-2 samples """
+    cmd = "python {0}/assets/artic_report.py {1} {2}".format(WD, input_folder, ticket_number)
+    log.debug("Command ran: {}".format(cmd))
+    proc = subprocess.Popen(cmd.split())
+    out, err = proc.communicate()
