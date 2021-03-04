@@ -11,7 +11,7 @@ import subprocess
 import sys
 
 from datetime import datetime
-from mutant import version
+from mutant import version, log
 
 #File work directory
 WD = os.path.dirname(os.path.realpath(__file__))
@@ -37,14 +37,17 @@ def analyse(ctx):
 def sarscov2(ctx, input_folder, config_case, outdir):
     #Derive prefix from config-case; else use default
     prefix = "artic-{}".format(TIMESTAMP)
-    if config-case != "":
+    if config_case != "":
         #Generate prefix dynamically from config-case
         pass
 
-    cmd = 'nextflow run {0}/externals/ncov2019-artic-nf/main.nf -profile singularity\
-            --illumina --prefix "{1}" --directory {2} --outdir {3}'.format(WD, prefix, input_folder, outdir)
+    cmd = 'nextflow run {0}/externals/ncov2019-artic-nf/main.nf -profile singularity --illumina --prefix "{1}" --directory {2} --outdir {3}'\
+            .format(WD, prefix, input_folder, outdir)
+    log.debug("Command ran: {}".format(cmd))
     proc = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
     out, err = proc.communicate()
+    log.info(out)
+    log.info(err)
 
 
 @analyse.command()
