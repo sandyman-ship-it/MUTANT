@@ -7,9 +7,15 @@
 import click
 import os
 import re
+import subprocess
 import sys
 
+from datetime import datetime
 from mutant import version
+
+#File work directory
+WD = os.path.dirname(os.path.realpath(__file__))
+TIMESTAMP = datetime.timestamp( datetime.now() ) 
 
 @click.group()
 @click.version_option(version)
@@ -24,9 +30,22 @@ def analyse(ctx):
     pass
 
 @analyse.command()
+@click.argument("input_folder")
+@click.option("--config_case", help="Provided config case",default="")
+@click.option("--outdir", help="Output folder", default="/tmp/")
 @click.pass_context
-def sarscov2(ctx):
-    pass
+def sarscov2(ctx, input_folder, config_case, outdir):
+    #Derive prefix from config-case; else use default
+    prefix = "artic-{}".format(TIMESTAMP)
+    if config-case != "":
+        #Generate prefix dynamically from config-case
+        pass
+
+    cmd = 'nextflow run {0}/externals/ncov2019-artic-nf/main.nf -profile singularity\
+            --illumina --prefix "{1}" --directory {2} --outdir {3}'.format(WD, prefix, input_folder, outdir)
+    proc = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    out, err = proc.communicate()
+
 
 @analyse.command()
 @click.pass_context
