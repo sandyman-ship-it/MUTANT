@@ -7,3 +7,12 @@
 [submodule "externals/microSALT"]
 	path = externals/microSALT
 	url = https://github.com/Clinical-Genomics/microSALT.git
+[submodule "MUTANT/externals/ncov2019-artic-nf"]
+	path = MUTANT/externals/ncov2019-artic-nf
+	url = https://github.com/genomic-medicine-sweden/ncov2019-artic-nf.git
+[submodule "MUTANT/externals/JASEN"]
+	path = MUTANT/externals/JASEN
+	url = https://github.com/genomic-medicine-sweden/JASEN.git
+[submodule "MUTANT/externals/microSALT"]
+	path = MUTANT/externals/microSALT
+	url = https://github.com/Clinical-Genomics/microSALT
