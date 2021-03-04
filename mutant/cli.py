@@ -31,18 +31,24 @@ def analyse(ctx):
 
 @analyse.command()
 @click.argument("input_folder")
+@click.option("--config", help="Custom artic configuration file", default="{}/config/hasta_artic.config".format(WD))
 @click.option("--config_case", help="Provided config case",default="")
 @click.option("--outdir", help="Output folder", default="/tmp/")
 @click.pass_context
-def sarscov2(ctx, input_folder, config_case, outdir):
+def sarscov2(ctx, input_folder, config_case, config, outdir):
     #Derive prefix from config-case; else use default
     prefix = "artic-{}".format(TIMESTAMP)
     if config_case != "":
         #Generate prefix dynamically from config-case
         pass
+    
+    confline = ""
+    if config != "":
+        config = os.path.abspath(config)
+        confline = "-C {0}".format(config)
 
-    cmd = 'nextflow run {0}/externals/ncov2019-artic-nf/main.nf -profile conda --illumina --prefix "{1}" --directory {2} --outdir {3}'\
-            .format(WD, prefix, input_folder, outdir)
+    cmd = 'nextflow run {0}/externals/ncov2019-artic-nf/main.nf {4} -profile conda --illumina --prefix "{1}" --directory {2} --outdir {3}'\
+            .format(WD, prefix, input_folder, outdir, confline)
     log.debug("Command ran: {}".format(cmd))
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
