@@ -47,8 +47,8 @@ def sarscov2(ctx, input_folder, config_case, config, outdir):
         config = os.path.abspath(config)
         confline = "-C {0}".format(config)
 
-    cmd = 'nextflow run {0}/externals/ncov2019-artic-nf/main.nf {4} -profile conda --illumina --prefix "{1}" --directory {2} --outdir {3}'\
-            .format(WD, prefix, input_folder, outdir, confline)
+    cmd = 'nextflow {0} run {1}/externals/ncov2019-artic-nf/main.nf -profile conda --illumina --prefix {2} --directory {3} --outdir {4}'\
+            .format(confline, WD, prefix, input_folder, outdir)
     log.debug("Command ran: {}".format(cmd))
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
