@@ -33,9 +33,10 @@ def analyse(ctx):
 @click.argument("input_folder")
 @click.option("--config", help="Custom artic configuration file", default="{}/config/hasta_artic.config".format(WD))
 @click.option("--config_case", help="Provided config case",default="")
-@click.option("--outdir", help="Output folder", default="/tmp/")
+@click.option("--outdir", help="Output folder", default="results")
+@click.option("--profiles", help="Execution profiles, comma-separated", default="singularity,slurm")
 @click.pass_context
-def sarscov2(ctx, input_folder, config_case, config, outdir):
+def sarscov2(ctx, input_folder, config_case, config, outdir, profiles):
     #Derive prefix from config-case; else use default
     prefix = "artic-{}".format(TIMESTAMP)
     if config_case != "":
@@ -47,8 +48,8 @@ def sarscov2(ctx, input_folder, config_case, config, outdir):
         config = os.path.abspath(config)
         confline = "-C {0}".format(config)
 
-    cmd = 'nextflow run {0}/externals/ncov2019-artic-nf/main.nf {4} -profile conda --illumina --prefix "{1}" --directory {2} --outdir {3}'\
-            .format(WD, prefix, input_folder, outdir, confline)
+    cmd = 'nextflow {0} run {1}/externals/ncov2019-artic-nf/main.nf -profile {2} --illumina --prefix {3} --directory {4} --outdir {5}'\
+            .format(confline, WD, profiles, prefix, input_folder, outdir)
     log.debug("Command ran: {}".format(cmd))
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
