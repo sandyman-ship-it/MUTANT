@@ -1,12 +1,3 @@
-[submodule "externals/ncov2019-artic-nf"]
-	path = mutant/externals/externals/ncov2019-artic-nf
-	url = https://github.com/genomic-medicine-sweden/ncov2019-artic-nf.git
-[submodule "externals/JASEN"]
-	path = mutant/externals/externals/JASEN
-	url = https://github.com/genomic-medicine-sweden/JASEN
-[submodule "externals/microSALT"]
-	path = mutant/externals/externals/microSALT
-	url = https://github.com/Clinical-Genomics/microSALT.git
 [submodule "MUTANT/externals/ncov2019-artic-nf"]
 	path = mutant/externals/ncov2019-artic-nf
 	url = https://github.com/genomic-medicine-sweden/ncov2019-artic-nf.git
