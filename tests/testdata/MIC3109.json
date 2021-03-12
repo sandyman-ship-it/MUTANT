@@ -1,5 +1,6 @@
 [
   {
+    "case_ID": "merrymink",
     "CG_ID_project": "MIC3109",
     "CG_ID_sample": "MIC3109A1",
     "Customer_ID_project": "AAA0000B1",
@@ -13,9 +14,13 @@
     "method_sequencing": "1036:15",
     "organism": "Salmonella Typhimurium LT2",
     "priority": "standard",
-    "reference": "SAMN02854572"
+    "reference": "SAMN02854572",
+    "region_code": "01",
+    "lab_code": "SE100",
+    "selection_criteria": "-"
   },
   {
+    "case_ID": "merrymink",
     "CG_ID_project": "MIC3109",
     "CG_ID_sample": "MIC3109A2",
     "Customer_ID_project": "AAA0000B1",
@@ -29,9 +34,13 @@
     "method_sequencing": "1036:15",
     "organism": "Staphylococcus aureus",
     "priority": "standard",
-    "reference": "SAMN02854573"
+    "reference": "SAMN02854573",
+    "region_code": "01",
+    "lab_code": "SE100",
+    "selection_criteria": "-"
   },
   {
+    "case_ID": "merrymink",
     "CG_ID_project": "MIC3109",
     "CG_ID_sample": "MIC3109A3",
     "Customer_ID_project": "AAA0000B1",
@@ -45,9 +54,13 @@
     "method_sequencing": "1036:15",
     "organism": "Pseudomonas aeruginosa",
     "priority": "standard",
-    "reference": "SAMN02854574"
+    "reference": "SAMN02854574",
+    "region_code": "01",
+    "lab_code": "SE100",
+    "selection_criteria": "-"
   },
   {
+    "case_ID": "merrymink",
     "CG_ID_project": "MIC3109",
     "CG_ID_sample": "MIC3109A4",
     "Customer_ID_project": "AAA0000B1",
@@ -61,9 +74,13 @@
     "method_sequencing": "1036:15",
     "organism": "Clostridium sporogenes",
     "priority": "standard",
-    "reference": "SAMN02854575"
+    "reference": "SAMN02854575",
+    "region_code": "01",
+    "lab_code": "SE100",
+    "selection_criteria": "-"
   },
   {
+    "case_ID": "merrymink",
     "CG_ID_project": "MIC3109",
     "CG_ID_sample": "MIC3109A5",
     "Customer_ID_project": "AAA0000B1",
@@ -77,6 +94,9 @@
     "method_sequencing": "1036:15",
     "organism": "MWGNXTR003",
     "priority": "standard",
-    "reference": "None"
+    "reference": "None",
+    "region_code": "01",
+    "lab_code": "SE100",
+    "selection_criteria": "-"
   }
 ]
