@@ -3,11 +3,9 @@
 
 import os
 import sys
-import re
 import click
 import json
 import subprocess
-from datetime import datetime
 from mutant import version, log
 
 class RunSC2:
@@ -18,10 +16,7 @@ class RunSC2:
         self.timestamp = timestamp
         self.WD = WD
         self.case = caseID
-        #self.prefix = "{}_{}".format(self.case, timestamp)
         self.prefix = prefix
-        #self.resdir = self.get_results_dir(config, outdir)
-        #self.workdir = os.path.join(self.resdir, "work")
         self.config_artic = config_artic
         self.profiles = profiles
 
