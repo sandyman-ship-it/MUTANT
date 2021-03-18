@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from mutant import version
 from setuptools import setup, find_packages
 
 try:
@@ -9,6 +10,7 @@ except IOError:
 
 setup(
     name="mutant",
+    version=version,
     long_description=__doc__,
     url="https://github.com/Clinical-Genomics/MUTANT",
     author="Isak Sylvin",
