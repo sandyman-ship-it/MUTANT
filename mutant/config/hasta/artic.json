@@ -24,7 +24,7 @@ params {
     help = false
     tracedir = "${params.outdir}/pipeline_info"
     // cache option makes it a bit easier to set conda or singularity cacheDir
-    cache = '/home/proj/development/microbial/sars-cov-2/nf-cache/'
+    cache = "/home/proj/development/microbial/sars-cov-2/nf-cache/"
     // Scheme name
     scheme = 'nCoV-2019'
     // Scheme version
