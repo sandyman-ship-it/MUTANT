@@ -1,5 +1,9 @@
 """ This script creates a custom report from the QC output of the ARTIC pipeline,
-    applied on SARS-CoV-2 samples 
+    applied on SARS-CoV-2 samples
+
+    To add:
+    * We need pangolin report data separated by region_lab. Do we need to loop through pangolin results files for each sample or region_lab.
+
     By: @talnor """
 import os
 import sys
@@ -82,7 +86,6 @@ def get_results(indir, voc_strain, voc_pos, voc_pos_aa):
                 if (pos in voc_pos) or (variant in voc_pos_aa):
                     append_dict(var_voc, sample, variant)
                 append_dict(var_all, sample, variant)
-
     # Add variant data to results
     if var_voc:
         for sample in artic_data.keys():
