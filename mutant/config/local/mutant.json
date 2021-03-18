@@ -1,0 +1,10 @@
+{
+  "_comment": "SARS-CoV-2",
+  "SARS-CoV-2": {
+    "_comment": "Folders",
+    "folders": {
+      "_comment": "Root folder for ALL output",
+      "results": "~/mutant/cases"
+    }
+  }
+}
