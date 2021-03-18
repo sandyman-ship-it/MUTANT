@@ -1,8 +1,0 @@
-name: mutant
-channels:
-  - anaconda
-  - bioconda
-  - conda-forge
-  - defaults
-dependencies:
-  - nextflow==20.10.0

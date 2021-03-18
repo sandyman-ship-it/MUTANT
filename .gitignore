@@ -2,6 +2,7 @@
 .nextflow.log.*
 .nextflow/
 work/
+nextflow
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
