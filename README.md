@@ -7,4 +7,4 @@ Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
 
 ## Runtime
 Add the MUTANT directory to your path. Execute using:
-`mutant analyse sarscov2 tests/testdata/fasta_files --profiles local,conda --config_artic mutant/config/local/artic.json`  
+`mutant analyse sarscov2 tests/testdata/fasta_files --profiles local,singularity --config_artic mutant/config/local/artic.json`  
