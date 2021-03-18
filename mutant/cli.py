@@ -13,6 +13,7 @@ import subprocess
 from datetime import datetime
 from mutant import version, log
 from mutant.assets.deliver.deliver_artic import DeliverSC2
+from mutant.assets.run.run_artic import RunSC2
 
 #File work directory
 WD = os.path.dirname(os.path.realpath(__file__))
@@ -32,47 +33,47 @@ def analyse(ctx):
 
 @analyse.command()
 @click.argument("input_folder")
-@click.option("--config", help="Custom artic configuration file", default="{}/config/hasta_artic.config".format(WD))
-@click.option("--config_case", help="Provided config case", default="")
-@click.option("--outdir", help="Output folder", default="results")
+@click.option("--config_artic", help="Custom artic configuration file", default="{}/config/artic_dev.config".format(WD))
+@click.option("--config_case", help="Provided config for the case", default="")
+@click.option("--config", help="General configuration file for MUTANT", default="")
+@click.option("--outdir", help="Output folder to override general configutations", default="")
 @click.option("--profiles", help="Execution profiles, comma-separated", default="singularity,slurm")
 @click.pass_context
-def sarscov2(ctx, input_folder, config_case, config, outdir, profiles):
+def sarscov2(ctx, input_folder, config_artic, config_case, config, outdir, profiles):
 
-    # Get sample information from config_case or use default values
+    # Set base for output files
     if config_case != "":
-        caseinfo = get_config_data(config_case)
-        prefix = "{}_{}".format(caseinfo[0]["case_ID"], TIMESTAMP)
-        #Check that all samples have the same region and lab code
+        caseinfo = get_json_data(config_case)
+        caseID = caseinfo[0]["case_ID"]
     else:
-        prefix = "artic_{}".format(TIMESTAMP)
+        caseID = "artic"
+    prefix = "{}_{}".format(caseID, TIMESTAMP)
 
-    # Set nextflow config
-    confline = ""
-    if config != "":
-        config = os.path.abspath(config)
-        confline = "-C {0}".format(config)
+    # Run
+    run = RunSC2(
+        input_folder=input_folder,
+        config_artic=config_artic,
+        caseID=caseID,
+        prefix=prefix,
+        profiles=profiles,
+        timestamp=TIMESTAMP,
+        WD=WD
+    )
+    resdir = run.get_results_dir(config, outdir)
+    run.run_case(resdir)
 
-    # Run Artic
-    cmd = 'nextflow {0} run {1}/externals/ncov2019-artic-nf/main.nf -profile {2} --illumina --prefix {3} --directory {4} --outdir {5}'\
-            .format(confline, WD, profiles, prefix, input_folder, outdir)
-    log.debug("Command ran: {}".format(cmd))
-    proc = subprocess.Popen(cmd.split())
-    out, err = proc.communicate()
-    log.info(out)
-    log.info(err)
-
-    # Reports
-    # Json
     # Deliverables
-    if config != "":
+    if config_case != "":
         delivery = DeliverSC2(
             caseinfo=caseinfo,
-            resdir=os.path.abspath(outdir),
-            TIMESTAMP=TIMESTAMP
+            resdir=os.path.abspath(resdir),
+            config_artic=config_artic,
+            timestamp=TIMESTAMP
         )
         delivery.rename_deliverables()
         delivery.gen_delivery(prefix)
+        delivery.create_fohm_csv()
+
     print("Done")
 
 @analyse.command()
@@ -95,17 +96,17 @@ def ArticReport(input_folder, ticket_number):
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
 
-def get_config_data(config):
+def get_json_data(config):
     if os.path.exists(config):
         """Get sample information as json object"""
         try:
             with open(config) as json_file:
                 data = json.load(json_file)
         except Exception as e:
-            click.echo("Unable to read provided sample info file as json. Exiting..")
+            click.echo("Unable to read provided json file: {}. Exiting..".format(config))
             click.echo(e)
             sys.exit(-1)
     else:
-        click.echo("Could not find supplied sample config. Exiting..")
+        click.echo("Could not find supplied config: {}. Exiting..".format(config))
         sys.exit(-1)
     return data
