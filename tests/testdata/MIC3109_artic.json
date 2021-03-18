@@ -8,7 +8,8 @@
     "priority": "standard",
     "region_code": "01",
     "lab_code": "SE100",
-    "selection_criteria": "-"
+    "selection_criteria": "7. Information saknas",
+    "cg_qc_pass": "True"
   },
   {
     "case_ID": "merrymink",
@@ -19,7 +20,8 @@
     "priority": "standard",
     "region_code": "01",
     "lab_code": "SE100",
-    "selection_criteria": "-"
+    "selection_criteria": "7. Information saknas",
+    "cg_qc_pass": "False"
   },
   {
     "case_ID": "merrymink",
@@ -30,7 +32,8 @@
     "priority": "standard",
     "region_code": "01",
     "lab_code": "SE100",
-    "selection_criteria": "-"
+    "selection_criteria": "7. Information saknas",
+    "cg_qc_pass": "True"
   },
   {
     "case_ID": "merrymink",
@@ -41,7 +44,8 @@
     "priority": "standard",
     "region_code": "01",
     "lab_code": "SE100",
-    "selection_criteria": "-"
+    "selection_criteria": "7. Information saknas",
+    "cg_qc_pass": "True"
   },
   {
     "case_ID": "merrymink",
@@ -52,6 +56,7 @@
     "priority": "standard",
     "region_code": "01",
     "lab_code": "SE100",
-    "selection_criteria": "-"
+    "selection_criteria": "7. Information saknas",
+    "cg_qc_pass": "True"
   }
 ]
