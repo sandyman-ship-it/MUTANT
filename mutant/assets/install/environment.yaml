@@ -6,3 +6,4 @@ channels:
   - defaults
 dependencies:
   - nextflow==20.10.0
+  - wheel

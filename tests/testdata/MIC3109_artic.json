@@ -1,0 +1,62 @@
+[
+  {
+    "case_ID": "merrymink",
+    "CG_ID_project": "MIC3109",
+    "CG_ID_sample": "MIC3109A1",
+    "Customer_ID_project": "AAA0000B1",
+    "Customer_ID_sample": "MG-001",
+    "priority": "standard",
+    "region_code": "01",
+    "lab_code": "SE100",
+    "selection_criteria": "7. Information saknas",
+    "cg_qc_pass": "True"
+  },
+  {
+    "case_ID": "merrymink",
+    "CG_ID_project": "MIC3109",
+    "CG_ID_sample": "MIC3109A2",
+    "Customer_ID_project": "AAA0000B1",
+    "Customer_ID_sample": "MG-002",
+    "priority": "standard",
+    "region_code": "01",
+    "lab_code": "SE100",
+    "selection_criteria": "7. Information saknas",
+    "cg_qc_pass": "False"
+  },
+  {
+    "case_ID": "merrymink",
+    "CG_ID_project": "MIC3109",
+    "CG_ID_sample": "MIC3109A3",
+    "Customer_ID_project": "AAA0000B1",
+    "Customer_ID_sample": "NTC1",
+    "priority": "standard",
+    "region_code": "01",
+    "lab_code": "SE100",
+    "selection_criteria": "7. Information saknas",
+    "cg_qc_pass": "True"
+  },
+  {
+    "case_ID": "merrymink",
+    "CG_ID_project": "MIC3109",
+    "CG_ID_sample": "MIC3109A4",
+    "Customer_ID_project": "AAA0000B1",
+    "Customer_ID_sample": "MG-004",
+    "priority": "standard",
+    "region_code": "01",
+    "lab_code": "SE100",
+    "selection_criteria": "7. Information saknas",
+    "cg_qc_pass": "True"
+  },
+  {
+    "case_ID": "merrymink",
+    "CG_ID_project": "MIC3109",
+    "CG_ID_sample": "MIC3109A5",
+    "Customer_ID_project": "AAA0000B1",
+    "Customer_ID_sample": "MG-005",
+    "priority": "standard",
+    "region_code": "01",
+    "lab_code": "SE100",
+    "selection_criteria": "7. Information saknas",
+    "cg_qc_pass": "True"
+  }
+]
