@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 
-scriptdir="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-
+SCRIPT=$(readlink -f $0)
+scriptdir=`dirname $SCRIPT`
 NAME=$1
-if [ $NAME ]; then
-    conda env create --name $NAME -f $scriptdir/environment.yaml
-else
-    conda env create -f $scriptdir/environment.yaml
-fi
+conda env create --name $NAME -f $scriptdir/environment.yaml

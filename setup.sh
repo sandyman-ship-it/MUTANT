@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-source ./mutant/assets/install/nextflow.sh
-bash ./mutant/assets/install/conda.sh
+bash ./mutant/assets/install/nextflow.sh
+bash ./mutant/assets/install/conda.sh "D_mutant"
 
-conda activate mutant
-pip install .
+conda activate D_mutant
+pip install -r requirements.txt
+pip install -e .
