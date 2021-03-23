@@ -1,6 +1,7 @@
 """ This script renames the output files for the ARTIC pipeline and Pangolin analysis,
     and creates a deliverables file for Clinical Genomics Infrastructure"""
 
+import glob
 import os
 from datetime import date
 import yaml
@@ -28,28 +29,34 @@ class DeliverSC2:
         self.today = today
 
     def rename_deliverables(self):
-
         """Rename result files for delivery: fastq, consensus files, vcf and pangolin"""
 
+        prefix_fa = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(self.indir)
+        prefix_vcf = "{0}/ncovIllumina_Genotyping_typeVariants/vcf".format(self.indir)
+
         for sampleinfo in self.caseinfo:
-            sample = sampleinfo["Customer_ID_sample"]
-            base = "{}_{}".format(sampleinfo["region_code"], sampleinfo["lab_code"])
-            # Fastq renaming
-            # Consensus renaming
-            fasta = os.path.join(self.indir, "ncovIllumina_sequenceAnalysis_makeConsensus/"
-                                             "{}.primertrimmed.consensus.fa".format(sample))
-            new_fasta = os.path.join(os.path.dirname(fasta), "{}_{}.consensus.fasta".format(base, sample))
-            os.rename(fasta, new_fasta)
-            # Rename VCF
-            vcf = os.path.join(self.indir, "ncovIllumina_Genotyping_typeVariants/vcf/{}.csq.vcf".format(sample))
-            new_vcf = os.path.join(os.path.dirname(vcf), "{}_{}.vcf".format(base, sample))
-            os.rename(vcf, new_vcf)
-        # Pangolin renaming
-        # pangolinRep = glob.glob(os.path.join(self.indir,
-        #                                     "ncovIllumina_sequenceAnalysis_makeConsensus/*pangolin.csv"))[0]
-        # new_pangolin = os.path.join(os.path.dirname(pangolinRep),
-        #                            "{}_{}_pangolin_classification.txt".format(base, self.today))
-        # os.rename(pangolinRep, new_pangolin)
+            sample = sampleinfo["CG_ID_sample"]
+            region = sampleinfo["region_code"].replace(' ', '_')
+            lab = sampleinfo["lab_code"].replace(' ', '_')
+
+            #This will only resolve once
+            for item in glob.glob("{0}/*{1}*".format(prefix_fa, sample)):
+                orgpath = "{1}".format(prefix_fa, item)
+                newpath = "{0}/{1}_{2}_{3}.consensus.fasta".format(prefix_fa, region, lab, sampleinfo["Customer_ID_sample"])
+                os.rename(orgpath, newpath)
+
+            #This will only resolve once
+            for item in glob.glob("{0}/*{1}*.csq.vcf".format(prefix_vcf, sample)):
+                orgpath = "{1}".format(prefix_vcf, item)
+                newpath = "{0}/{1}_{2}_{3}.vcf".format(prefix_vcf, region, lab, sampleinfo["Customer_ID_sample"])
+                os.rename(orgpath, newpath)
+           
+            # Pangolin renaming
+            # pangolinRep = glob.glob(os.path.join(self.indir,
+            #                                     "ncovIllumina_sequenceAnalysis_makeConsensus/*pangolin.csv"))[0]
+            # new_pangolin = os.path.join(os.path.dirname(pangolinRep),
+            #                            "{}_{}_pangolin_classification.txt".format(base, self.today))
+            # os.rename(pangolinRep, new_pangolin)
 
     def gen_delivery(self, prefix):
 

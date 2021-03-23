@@ -74,7 +74,6 @@ def sarscov2(ctx, input_folder, config_artic, config_case, config, outdir, profi
         delivery.gen_delivery(prefix)
         delivery.create_fohm_csv()
 
-    print("Done")
 
 @analyse.command()
 @click.pass_context
@@ -86,11 +85,50 @@ def jasen(ctx):
 def toolbox(ctx):
     pass
 
+@toolbox.group()
+@click.pass_context
+def sarscov2(ctx):
+    pass
+
+
+@sarscov2.command()
+@click.argument("input_folder")
+@click.option("--config_artic", help="Custom artic configuration file", default="{}/config/hasta/artic.json".format(WD))
+@click.option("--config_case", help="Provided config for the case", default="")
+@click.option("--config", help="General configuration file for MUTANT", default="")
+@click.pass_context
+def deliver(ctx, input_folder, config_artic, config_case, config):
+    """Generates CG specific delivery files"""
+
+
+    # Set base for output files
+    if config_case != "":
+        caseinfo = get_json_data(config_case)
+        caseID = caseinfo[0]["case_ID"]
+    else:
+        caseID = "artic"
+    prefix = "{}_{}".format(caseID, TIMESTAMP)
+
+    resdir = input_folder
+
+    # Deliverables
+    if config_case != "":
+        delivery = DeliverSC2(
+            caseinfo=caseinfo,
+            resdir=os.path.abspath(resdir),
+            config_artic=config_artic,
+            timestamp=TIMESTAMP
+        )
+        delivery.rename_deliverables()
+        delivery.gen_delivery(prefix)
+        delivery.create_fohm_csv()
+
+
 @toolbox.command()
 @click.argument("input_folder")
 @click.argument("ticket_number")
 def ArticReport(input_folder, ticket_number):
-    """ Custom report from the QC output of the ARTIC pipeline, applied on SARS-CoV-2 samples """
+    """Report for QC output of the ARTIC pipeline"""
     cmd = "python {0}/assets/artic_report.py {1} {2}".format(WD, input_folder, ticket_number)
     log.debug("Command ran: {}".format(cmd))
     proc = subprocess.Popen(cmd.split())
