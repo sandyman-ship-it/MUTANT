@@ -46,7 +46,7 @@ class DeliverSC2:
                 os.rename(orgpath, newpath)
 
             #This will only resolve once
-            for item in glob.glob("{0}/{1}.csq.vcf".format(prefix_vcf, sample)):
+            for item in glob.glob("{0}/*{1}*.csq.vcf".format(prefix_vcf, sample)):
                 orgpath = "{1}".format(prefix_vcf, item)
                 newpath = "{0}/{1}_{2}_{3}.vcf".format(prefix_vcf, region, lab, sampleinfo["Customer_ID_sample"])
                 os.rename(orgpath, newpath)

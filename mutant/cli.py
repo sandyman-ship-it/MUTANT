@@ -49,8 +49,6 @@ def sarscov2(ctx, input_folder, config_artic, config_case, config, outdir, profi
         caseID = "artic"
     prefix = "{}_{}".format(caseID, TIMESTAMP)
 
-    resdir = run.get_results_dir(config, outdir)
-
     # Run
     run = RunSC2(
         input_folder=input_folder,
@@ -61,6 +59,7 @@ def sarscov2(ctx, input_folder, config_artic, config_case, config, outdir, profi
         timestamp=TIMESTAMP,
         WD=WD
     )
+    resdir = run.get_results_dir(config, outdir)
     run.run_case(resdir)
 
     # Deliverables
