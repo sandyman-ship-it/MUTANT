@@ -93,12 +93,12 @@ def sarscov2(ctx):
 
 
 @sarscov2.command()
+@click.argument("input_folder")
 @click.option("--config_artic", help="Custom artic configuration file", default="{}/config/hasta/artic.json".format(WD))
 @click.option("--config_case", help="Provided config for the case", default="")
 @click.option("--config", help="General configuration file for MUTANT", default="")
-@click.option("--outdir", help="Output folder to override general configutations", default="")
 @click.pass_context
-def deliver(ctx, config_artic, config_case, config, outdir):
+def deliver(ctx, input_folder, config_artic, config_case, config):
     """Generates CG specific delivery files"""
 
 
@@ -110,7 +110,7 @@ def deliver(ctx, config_artic, config_case, config, outdir):
         caseID = "artic"
     prefix = "{}_{}".format(caseID, TIMESTAMP)
 
-    resdir = run.get_results_dir(config, outdir)
+    resdir = input_folder
 
     # Deliverables
     if config_case != "":

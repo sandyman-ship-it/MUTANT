@@ -41,14 +41,14 @@ class DeliverSC2:
 
             #This will only resolve once
             for item in glob.glob("{0}/*{1}*".format(prefix_fa, sample)):
-                orgpath = "{0}/{1}".format(prefix, item)
-                newpath = "{0}/{1}_{2}.consensus.fasta".format(prefix, region, lab, sampleinfo["Customer_ID_sample"])
+                orgpath = "{1}".format(prefix_fa, item)
+                newpath = "{0}/{1}_{2}_{3}.consensus.fasta".format(prefix_fa, region, lab, sampleinfo["Customer_ID_sample"])
                 os.rename(orgpath, newpath)
 
             #This will only resolve once
             for item in glob.glob("{0}/{1}.csq.vcf".format(prefix_vcf, sample)):
-                orgpath = "{0}/{1}".format(prefix, item)
-                newpath = "{0}/{1}_{2}.vcf".format(prefix, region, lab, sampleinfo["Customer_ID_sample"])
+                orgpath = "{1}".format(prefix_vcf, item)
+                newpath = "{0}/{1}_{2}_{3}.vcf".format(prefix_vcf, region, lab, sampleinfo["Customer_ID_sample"])
                 os.rename(orgpath, newpath)
            
             # Pangolin renaming
