@@ -31,25 +31,28 @@ class DeliverSC2:
     def rename_deliverables(self):
         """Rename result files for delivery: fastq, consensus files, vcf and pangolin"""
 
-        prefix_fa = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(self.indir)
-        prefix_vcf = "{0}/ncovIllumina_Genotyping_typeVariants/vcf".format(self.indir)
-
         for sampleinfo in self.caseinfo:
             sample = sampleinfo["CG_ID_sample"]
             region = sampleinfo["region_code"].replace(' ', '_')
             lab = sampleinfo["lab_code"].replace(' ', '_')
 
-            #This will only resolve once
-            for item in glob.glob("{0}/*{1}*".format(prefix_fa, sample)):
-                orgpath = "{1}".format(prefix_fa, item)
-                newpath = "{0}/{1}_{2}_{3}.consensus.fasta".format(prefix_fa, region, lab, sampleinfo["Customer_ID_sample"])
-                os.rename(orgpath, newpath)
+            #rename makeConsensus
+            prefix_fa = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(self.indir)
+            for item in glob.glob("{0}/*{1}*".format(prefix, sample)):
+                newpath = "{0}/{1}_{2}_{3}.consensus.fasta".format(prefix, region, lab, sampleinfo["Customer_ID_sample"])
+                os.rename(item, newpath)
 
-            #This will only resolve once
-            for item in glob.glob("{0}/*{1}*.csq.vcf".format(prefix_vcf, sample)):
-                orgpath = "{1}".format(prefix_vcf, item)
-                newpath = "{0}/{1}_{2}_{3}.vcf".format(prefix_vcf, region, lab, sampleinfo["Customer_ID_sample"])
-                os.rename(orgpath, newpath)
+            #rename typeVariants
+            prefix = "{0}/ncovIllumina_Genotyping_typeVariants/vcf".format(self.indir)
+            for item in glob.glob("{0}/*{1}*.csq.vcf".format(prefix, sample)):
+                newpath = "{0}/{1}_{2}_{3}.vcf".format(prefix, region, lab, sampleinfo["Customer_ID_sample"])
+                os.rename(item, newpath)
+
+            #rename callVariants
+            prefix = "{0}/ncovIllumina_Genotyping_callVariants".format(self.indir)
+            for item in glob.glob("{0}/*{1}*.variants.tsv".format(prefix, sample)):
+                newpath = "{0}/{1}_{2}_{3}.variants.tsv".format(prefix, region, lab, sampleinfo["Customer_ID_sample"])
+                os.rename(item, newpath)
            
             # Pangolin renaming
             # pangolinRep = glob.glob(os.path.join(self.indir,
@@ -117,8 +120,9 @@ class DeliverSC2:
         for record in self.caseinfo:
             sampleID = record["CG_ID_sample"]
             sample = record["Customer_ID_sample"]
-            base = "{}_{}".format(record["region_code"], record["lab_code"])
-            base_sample = "{}_{}".format(base, sampleID)
+            region = record["region_code"].replace(' ', '_')
+            lab = record["lab_code"].replace(' ', '_')
+            base_sample = "{0}_{1}_{2}".format(region, lab, sample)
             # Concat reads forwards
             deliv['files'].append({'format': 'fastq', 'id': sampleID,
                                    'path': "{0}/concat/{1}_1.fastq.gz".format(self.indir, base_sample),
@@ -156,13 +160,17 @@ class DeliverSC2:
 
         # Add header to summary files
         for regionlab in self.regionlabs:
-            sumfile = os.path.join(self.indir, "{}_{}_komplettering.csv".format(regionlab, self.today))
+            sumfile = os.path.join(self.indir, "{}_{}_komplettering.csv".format(regionlab.replace(' ', '_'), self.today))
             with open(sumfile, "w") as summary:
                 summary.write("provnummer,urvalskriterium,GISAID_accession\n")
+
         # Write sample information to corresponding summary file
         for record in self.caseinfo:
-            sumfile = os.path.join(self.indir, "{}_{}_{}_komplettering.csv".format(record["region_code"],
-                                                                                   record["lab_code"], self.today))
+            region = record["region_code"].replace(' ', '_')
+            lab = record["lab_code"].replace(' ', '_')
+            sumfile = os.path.join(self.indir, "{}_{}_{}_komplettering.csv".format(region, lab, self.today))
             with open(sumfile, "a") as out:
                 summary = csv.writer(out)
                 summary.writerow([record["Customer_ID_sample"], record["selection_criteria"].split(".")[1].strip()])
+
+
