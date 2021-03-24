@@ -53,6 +53,12 @@ class DeliverSC2:
             for item in glob.glob("{0}/*{1}*.variants.tsv".format(prefix, sample)):
                 newpath = "{0}/{1}_{2}_{3}.variants.tsv".format(prefix, region, lab, sampleinfo["Customer_ID_sample"])
                 os.rename(item, newpath)
+
+            #rename ReadMapping
+            prefix = "{0}/ncovIllumina_Genotyping_readMapping".format(self.indir)
+            for item in glob.glob("{0}/*{1}*.sorted.bam".format(prefix, sample)):
+                newpath = "{0}/{1}.sorted.bam".format(prefix, sampleinfo["Customer_ID_sample"])
+                os.rename(item, newpath)
            
             # Pangolin renaming
             # pangolinRep = glob.glob(os.path.join(self.indir,
