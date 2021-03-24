@@ -14,7 +14,7 @@ class DeliverSC2:
 
         regionlab_list = []
         for record in caseinfo:
-            regionlab = "{}_{}".format(region, lab)
+            regionlab = "{}_{}".format(record["region_code"], record["lab_code"])
             if regionlab not in regionlab_list:
                 regionlab_list.append(regionlab)
         self.caseinfo = caseinfo
