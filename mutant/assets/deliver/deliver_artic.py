@@ -14,7 +14,7 @@ class DeliverSC2:
 
         regionlab_list = []
         for record in caseinfo:
-            regionlab = "{}_{}".format(record["region_code"], record["lab_code"])
+            regionlab = "{}_{}".format(region, lab)
             if regionlab not in regionlab_list:
                 regionlab_list.append(regionlab)
         self.caseinfo = caseinfo
@@ -100,16 +100,17 @@ class DeliverSC2:
         # Region-lab-wide
 
         for regionlab in self.regionlabs:
+            rl = regionlab.replace(' ', "_")
             # Pangolin reports
             deliv['files'].append({'format': 'csv', 'id': self.case,
                                    'path': "{}/ncovIllumina_sequenceAnalysis_makeConsensus/"
-                                           "{}_{}_pangolin_classification.txt".format(self.indir, regionlab,
+                                           "{}_{}_pangolin_classification.txt".format(self.indir, rl,
                                                                                       self.today),
                                    'path_index': '~', 'step': 'typing', 'tag': 'SARS-CoV-2-type'})
             # FoHM delivery file
             deliv['files'].append({'format': 'csv', 'id': self.case,
                                    'path': os.path.join(self.indir,
-                                                        "{}_{}_komplettering.csv".format(regionlab, self.today)),
+                                                        "{}_{}_komplettering.csv".format(rl, self.today)),
                                    'path_index': '~', 'step': 'report', 'tag': 'SARS-CoV-2-info'})
 
         # Sample-wide
@@ -117,7 +118,9 @@ class DeliverSC2:
         for record in self.caseinfo:
             sampleID = record["CG_ID_sample"]
             sample = record["Customer_ID_sample"]
-            base = "{}_{}".format(record["region_code"], record["lab_code"])
+            region = record["region_code"].replace(' ', '_')
+            lab = record["lab_code"].replace(' ', '_')
+            base = "{}_{}".format(region, lab)
             base_sample = "{}_{}".format(base, sampleID)
             # Concat reads forwards
             deliv['files'].append({'format': 'fastq', 'id': sampleID,
