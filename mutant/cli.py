@@ -71,7 +71,7 @@ def sarscov2(ctx, input_folder, config_artic, config_case, config, outdir, profi
             timestamp=TIMESTAMP
         )
         delivery.rename_deliverables()
-        delivery.gen_delivery(prefix)
+        delivery.gen_delivery()
         delivery.create_fohm_csv()
 
 
