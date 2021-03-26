@@ -43,11 +43,11 @@ def analyse(ctx):
 @click.argument("input_folder")
 @click.option("--config_artic", help="Custom artic configuration file", default="{}/config/hasta/artic.json".format(WD))
 @click.option("--config_case", help="Provided config for the case", default="")
-@click.option("--config", help="General configuration file for MUTANT", default="")
+@click.option("--config_mutant", help="General configuration file for MUTANT", default="")
 @click.option("--outdir", help="Output folder to override general configutations", default="")
 @click.option("--profiles", help="Execution profiles, comma-separated", default="singularity,slurm")
 @click.pass_context
-def sarscov2(ctx, input_folder, config_artic, config_case, config, outdir, profiles):
+def sarscov2(ctx, input_folder, config_artic, config_case, config_mutant, outdir, profiles):
 
     # Set base for output files
     if config_case != "":
@@ -67,7 +67,7 @@ def sarscov2(ctx, input_folder, config_artic, config_case, config, outdir, profi
         timestamp=TIMESTAMP,
         WD=WD
     )
-    resdir = run.get_results_dir(config, outdir)
+    resdir = run.get_results_dir(config_mutant, outdir)
     run.run_case(resdir)
 
     # Deliverables
@@ -102,10 +102,9 @@ def sarscov2(ctx):
 @sarscov2.command()
 @click.argument("input_folder")
 @click.option("--config_artic", help="Custom artic configuration file", default="{}/config/hasta/artic.json".format(WD))
-@click.option("--config_case", help="Provided config for the case", default="")
-@click.option("--config", help="General configuration file for MUTANT", default="")
+@click.option("--config_case", help="Provided config for the case", required=True)
 @click.pass_context
-def cgmodifications(ctx, input_folder, config_artic, config_case, config):
+def cgmodifications(ctx, input_folder, config_artic, config_case):
     """Applies all cg modifications as a batch"""
 
 
@@ -133,10 +132,9 @@ def cgmodifications(ctx, input_folder, config_artic, config_case, config):
 @sarscov2.command()
 @click.argument("input_folder")
 @click.option("--config_artic", help="Custom artic configuration file", default="{}/config/hasta/artic.json".format(WD))
-@click.option("--config_case", help="Provided config for the case", default="")
-@click.option("--config", help="General configuration file for MUTANT", default="")
+@click.option("--config_case", help="Provided config for the case", required=True)
 @click.pass_context
-def rename(ctx, input_folder, config_artic, config_case, config):
+def rename(ctx, input_folder, config_artic, config_case):
     """Renames covid output to CG standard"""
 
 
@@ -162,10 +160,9 @@ def rename(ctx, input_folder, config_artic, config_case, config):
 @sarscov2.command()
 @click.argument("input_folder")
 @click.option("--config_artic", help="Custom artic configuration file", default="{}/config/hasta/artic.json".format(WD))
-@click.option("--config_case", help="Provided config for the case", default="")
-@click.option("--config", help="General configuration file for MUTANT", default="")
+@click.option("--config_case", help="Provided config for the case", required=True)
 @click.pass_context
-def deliveryfile(ctx, input_folder, config_artic, config_case, config):
+def deliveryfile(ctx, input_folder, config_artic, config_case):
     """Generates CG specific delivery file"""
 
 
@@ -191,10 +188,9 @@ def deliveryfile(ctx, input_folder, config_artic, config_case, config):
 @sarscov2.command()
 @click.argument("input_folder")
 @click.option("--config_artic", help="Custom artic configuration file", default="{}/config/hasta/artic.json".format(WD))
-@click.option("--config_case", help="Provided config for the case", default="")
-@click.option("--config", help="General configuration file for MUTANT", default="")
+@click.option("--config_case", help="Provided config for the case", required=True)
 @click.pass_context
-def fohmfile(ctx, input_folder, config_artic, config_case, config):
+def fohmfile(ctx, input_folder, config_artic, config_case):
     """Generates FoHM demanded delivery file"""
 
 
