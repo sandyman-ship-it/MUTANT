@@ -19,6 +19,14 @@ from mutant.assets.run.run_artic import RunSC2
 WD = os.path.dirname(os.path.realpath(__file__))
 TIMESTAMP = datetime.now().strftime("%y%m%d-%H%M%S")
 
+def get_sarscov2_config(config):
+    """Parse SARS-CoV-2 sample config"""
+    caseinfo = get_json_data(config)
+    for i in range(len(caseinfo)):
+        caseinfo[i]["region_code"] = caseinfo[i]["region_code"].split()[0]
+        caseinfo[i]["lab_code"] = caseinfo[i]["lab_code"].split()[0]
+    return caseinfo
+
 @click.group()
 @click.version_option(version)
 @click.pass_context
