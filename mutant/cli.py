@@ -19,6 +19,22 @@ from mutant.assets.run.run_artic import RunSC2
 WD = os.path.dirname(os.path.realpath(__file__))
 TIMESTAMP = datetime.now().strftime("%y%m%d-%H%M%S")
 
+
+def get_json_data(config):
+    if os.path.exists(config):
+        """Get sample information as json object"""
+        try:
+            with open(config) as json_file:
+                data = json.load(json_file)
+        except Exception as e:
+            click.echo("Unable to read provided json file: {}. Exiting..".format(config))
+            click.echo(e)
+            sys.exit(-1)
+    else:
+        click.echo("Could not find supplied config: {}. Exiting..".format(config))
+        sys.exit(-1)
+    return data
+
 def get_sarscov2_config(config):
     """Parse SARS-CoV-2 sample config"""
     caseinfo = get_json_data(config)
@@ -73,7 +89,7 @@ def sarscov2(ctx, input_folder, config_artic, config_case, config_mutant, outdir
     # Deliverables
     if config_case != "":
         delivery = DeliverSC2(
-            caseinfo=caseinfo,
+            caseinfo=config_case,
             resdir=os.path.abspath(resdir),
             config_artic=config_artic,
             timestamp=TIMESTAMP
@@ -108,20 +124,11 @@ def cgmodifications(ctx, input_folder, config_artic, config_case):
     """Applies all cg modifications as a batch"""
 
 
-    # Set base for output files
-    if config_case != "":
-        caseinfo = get_json_data(config_case)
-        caseID = caseinfo[0]["case_ID"]
-    else:
-        caseID = "artic"
-
-    resdir = input_folder
-
     # Deliverables
     if config_case != "":
         delivery = DeliverSC2(
-            caseinfo=caseinfo,
-            resdir=os.path.abspath(resdir),
+            caseinfo=config_case,
+            resdir=os.path.abspath(input_folder),
             config_artic=config_artic,
             timestamp=TIMESTAMP
         )
@@ -137,21 +144,11 @@ def cgmodifications(ctx, input_folder, config_artic, config_case):
 def rename(ctx, input_folder, config_artic, config_case):
     """Renames covid output to CG standard"""
 
-    # Set base for output files
-    if config_case != "":
-        caseinfo = get_json_data(config_case)
-        caseID = caseinfo[0]["case_ID"]
-    else:
-        caseID = "artic"
-
-
-    resdir = input_folder
-
     # Deliverables
     if config_case != "":
         delivery = DeliverSC2(
-            caseinfo=caseinfo,
-            resdir=os.path.abspath(resdir),
+            caseinfo=config_case,
+            resdir=os.path.abspath(input_folder),
             config_artic=config_artic,
             timestamp=TIMESTAMP
         )
@@ -165,21 +162,11 @@ def rename(ctx, input_folder, config_artic, config_case):
 def deliveryfile(ctx, input_folder, config_artic, config_case):
     """Generates CG specific delivery file"""
 
-
-    # Set base for output files
-    if config_case != "":
-        caseinfo = get_json_data(config_case)
-        caseID = caseinfo[0]["case_ID"]
-    else:
-        caseID = "artic"
-
-    resdir = input_folder
-
     # Deliverables
     if config_case != "":
         delivery = DeliverSC2(
-            caseinfo=caseinfo,
-            resdir=os.path.abspath(resdir),
+            caseinfo=config_case,
+            resdir=os.path.abspath(input_folder),
             config_artic=config_artic,
             timestamp=TIMESTAMP
         )
@@ -194,20 +181,11 @@ def fohmfile(ctx, input_folder, config_artic, config_case):
     """Generates FoHM demanded delivery file"""
 
 
-    # Set base for output files
-    if config_case != "":
-        caseinfo = get_json_data(config_case)
-        caseID = caseinfo[0]["case_ID"]
-    else:
-        caseID = "artic"
-
-    resdir = input_folder
-
     # Deliverables
     if config_case != "":
         delivery = DeliverSC2(
-            caseinfo=caseinfo,
-            resdir=os.path.abspath(resdir),
+            caseinfo=config_case,
+            resdir=os.path.abspath(input_folder),
             config_artic=config_artic,
             timestamp=TIMESTAMP
         )
@@ -222,18 +200,3 @@ def ArticReport(input_folder, ticket_number):
     log.debug("Command ran: {}".format(cmd))
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
-
-def get_json_data(config):
-    if os.path.exists(config):
-        """Get sample information as json object"""
-        try:
-            with open(config) as json_file:
-                data = json.load(json_file)
-        except Exception as e:
-            click.echo("Unable to read provided json file: {}. Exiting..".format(config))
-            click.echo(e)
-            sys.exit(-1)
-    else:
-        click.echo("Could not find supplied config: {}. Exiting..".format(config))
-        sys.exit(-1)
-    return data

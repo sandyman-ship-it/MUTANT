@@ -1,16 +1,38 @@
 """ This script renames the output files for the ARTIC pipeline and Pangolin analysis,
-    and creates a deliverables file for Clinical Genomics Infrastructure"""
+    and creates a deliverables file for Clinical Genomics Infrastructure
 
+By: Isak Sylvin & Tanja Normark
+"""
+
+from datetime import date
+
+import csv
 import glob
 import os
-from datetime import date
+import json
 import yaml
-import csv
 
+
+def get_json_data(config):
+    if os.path.exists(config):
+        """Get sample information as json object"""
+        try:
+            with open(config) as json_file:
+                data = json.load(json_file)
+        except Exception as e:
+            click.echo("Unable to read provided json file: {}. Exiting..".format(config))
+            click.echo(e)
+            sys.exit(-1)
+    else:
+        click.echo("Could not find supplied config: {}. Exiting..".format(config))
+        sys.exit(-1)
+    return data
 
 class DeliverSC2:
 
     def __init__(self, caseinfo, resdir, config_artic, timestamp):
+        self.casefile = caseinfo
+        caseinfo = get_json_data(caseinfo)
 
         regionlab_list = []
         for record in caseinfo:
@@ -49,13 +71,13 @@ class DeliverSC2:
                 os.rename(item, newpath)
 
             #rename callVariants
-            prefix = "{0}/ncovIllumina_Genotyping_callVariants".format(self.indir)
+            prefix = "{0}/ncovIllumina_sequenceAnalysis_callVariants".format(self.indir)
             for item in glob.glob("{0}/*{1}*.variants.tsv".format(prefix, sample)):
                 newpath = "{0}/{1}_{2}_{3}.variants.tsv".format(prefix, region, lab, sampleinfo["Customer_ID_sample"])
                 os.rename(item, newpath)
 
             #rename ReadMapping
-            prefix = "{0}/ncovIllumina_Genotyping_readMapping".format(self.indir)
+            prefix = "{0}/ncovIllumina_sequenceAnalysis_readMapping".format(self.indir)
             for item in glob.glob("{0}/*{1}*.sorted.bam".format(prefix, sample)):
                 newpath = "{0}/{1}.sorted.bam".format(prefix, sampleinfo["Customer_ID_sample"])
                 os.rename(item, newpath)
@@ -79,7 +101,6 @@ class DeliverSC2:
         # Project-wide
 
         # Summary report
-        #frankhusky_210324-160122.typing_summary.csv
         deliv['files'].append({'format': 'csv', 'id': self.case,
                                'path': "{}/{}.typing_summary.csv".format(self.indir, self.ticket),
                                'path_index': '~', 'step': 'report', 'tag': 'SARS-CoV-2-sum'})
@@ -95,9 +116,9 @@ class DeliverSC2:
         deliv['files'].append({'format': 'json', 'id': self.case,
                                'path': "{}/{}.json".format(self.indir, self.case),
                                'path_index': '~', 'step': 'result_aggregation', 'tag': 'SARS-CoV-2-json'})
-        # Sampleinfo
+        # Sampleinfo/Case
         deliv['files'].append({'format': 'json', 'id': self.case,
-                               'path': "{}/{}_sampleinfo.json".format(self.indir, self.case),
+                               'path': "{}".format(self.casefile),
                                'path_index': '~', 'step': 'runinfo', 'tag': 'sampleinfo'})
         # Settings dump
         deliv['files'].append({'format': 'txt', 'id': self.case,
