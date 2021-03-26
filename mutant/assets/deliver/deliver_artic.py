@@ -37,7 +37,7 @@ class DeliverSC2:
             lab = sampleinfo["lab_code"].replace(' ', '_')
 
             #rename makeConsensus
-            prefix_fa = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(self.indir)
+            prefix = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(self.indir)
             for item in glob.glob("{0}/*{1}*".format(prefix, sample)):
                 newpath = "{0}/{1}_{2}_{3}.consensus.fasta".format(prefix, region, lab, sampleinfo["Customer_ID_sample"])
                 os.rename(item, newpath)
@@ -63,8 +63,10 @@ class DeliverSC2:
             #rename core
             core_suffix = ['.qc.csv','.pangolin.csv','.typing_summary.csv','.variant_summary.csv']
             for thing in core_suffix:
-                hit = glog.glob("*{0}".format(thing))
-                os.rename(hit, "{0}/{1}{2}".format(self.ticket, thing))
+                hit = glob.glob("{0}/*{1}".format(self.indir, thing))
+                if len(hit) == 1:
+                    hit=hit[0]
+                    os.rename(hit, "{0}/{1}{2}".format(self.indir, self.ticket, thing))
            
     def create_deliveryfile(self):
 

@@ -79,7 +79,7 @@ def sarscov2(ctx, input_folder, config_artic, config_case, config_mutant, outdir
             timestamp=TIMESTAMP
         )
         delivery.rename_deliverables()
-        delivery.create_deliveryfile()
+        delivery.create_deliveryfile(prefix)
         delivery.create_fohm_csv()
 
 
@@ -126,7 +126,7 @@ def cgmodifications(ctx, input_folder, config_artic, config_case):
             timestamp=TIMESTAMP
         )
         delivery.rename_deliverables()
-        delivery.create_deliveryfile(prefix)
+        delivery.create_deliveryfile()
         delivery.create_fohm_csv()
 
 @sarscov2.command()
@@ -137,13 +137,13 @@ def cgmodifications(ctx, input_folder, config_artic, config_case):
 def rename(ctx, input_folder, config_artic, config_case):
     """Renames covid output to CG standard"""
 
-
     # Set base for output files
     if config_case != "":
         caseinfo = get_json_data(config_case)
         caseID = caseinfo[0]["case_ID"]
     else:
         caseID = "artic"
+
 
     resdir = input_folder
 
@@ -183,7 +183,7 @@ def deliveryfile(ctx, input_folder, config_artic, config_case):
             config_artic=config_artic,
             timestamp=TIMESTAMP
         )
-        delivery.create_deliveryfile(prefix)
+        delivery.create_deliveryfile()
 
 @sarscov2.command()
 @click.argument("input_folder")
