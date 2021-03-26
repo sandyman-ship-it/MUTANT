@@ -109,16 +109,17 @@ class DeliverSC2:
         # Region-lab-wide
 
         for regionlab in self.regionlabs:
+            rl = regionlab.replace(' ', "_")
             # Pangolin reports
             deliv['files'].append({'format': 'csv', 'id': self.case,
-                                   'path': "{}/"
-                                           "{}_{}_pangolin_classification.txt".format(self.indir, regionlab,
+                                   'path': "{}/ncovIllumina_sequenceAnalysis_makeConsensus/"
+                                           "{}_{}_pangolin_classification.txt".format(self.indir, rl,
                                                                                       self.today),
                                    'path_index': '~', 'step': 'typing', 'tag': 'SARS-CoV-2-type'})
             # FoHM delivery file
             deliv['files'].append({'format': 'csv', 'id': self.case,
                                    'path': os.path.join(self.indir,
-                                                        "{}_{}_komplettering.csv".format(regionlab, self.today)),
+                                                        "{}_{}_komplettering.csv".format(rl, self.today)),
                                    'path_index': '~', 'step': 'report', 'tag': 'SARS-CoV-2-info'})
 
         # Sample-wide
