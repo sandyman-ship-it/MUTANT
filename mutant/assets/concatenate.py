@@ -16,7 +16,7 @@ if len(sys.argv) != 3:
 base_path = sys.argv[1]
 app_tag = sys.argv[2]
 
-PREFIX_TO_CONCATENATE = ["MWL", "MWR", "MWX", "VWG"]
+PREFIX_TO_CONCATENATE = ["MWG", "MWL", "MWM", "MWR", "MWX", "VWG", "VWL", "VWM"]
 should_concatenate = False
 
 for prefix in PREFIX_TO_CONCATENATE:
