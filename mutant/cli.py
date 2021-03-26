@@ -110,3 +110,14 @@ def get_json_data(config):
         click.echo("Could not find supplied config: {}. Exiting..".format(config))
         sys.exit(-1)
     return data
+
+@toolbox.command()
+@click.argument("input_folder")
+@click.argument("app_tag")
+@click.pass_context
+def concatenate(input_folder, app_tag):
+    """ Concatenates the hard linked files in a customer inbox if needed """
+    cmd = "python {0}/assets/concatenate.py {1} {2}".format(WD, input_folder, app_tag)
+    log.debug("Command ran: {}".format(cmd))
+    proc = subprocess.Popen(cmd.split())
+    out, err = proc.communicate()
