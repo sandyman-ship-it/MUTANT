@@ -1,5 +1,7 @@
 import os
+import sys
 import json
+import click
 
 def get_json(config):
     """Read json file"""
