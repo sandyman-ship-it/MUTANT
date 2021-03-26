@@ -66,7 +66,7 @@ class DeliverSC2:
                 hit = glog.glob("*{0}".format(thing))
                 os.rename(hit, "{0}/{1}{2}".format(self.ticket, thing))
            
-    def gen_delivery(self):
+    def create_deliveryfile(self):
 
         """Create deliverables file"""
 

@@ -71,7 +71,7 @@ def sarscov2(ctx, input_folder, config_artic, config_case, config, outdir, profi
             timestamp=TIMESTAMP
         )
         delivery.rename_deliverables()
-        delivery.gen_delivery()
+        delivery.create_deliveryfile()
         delivery.create_fohm_csv()
 
 
@@ -97,8 +97,8 @@ def sarscov2(ctx):
 @click.option("--config_case", help="Provided config for the case", default="")
 @click.option("--config", help="General configuration file for MUTANT", default="")
 @click.pass_context
-def deliver(ctx, input_folder, config_artic, config_case, config):
-    """Generates CG specific delivery files"""
+def cgmodifications(ctx, input_folder, config_artic, config_case, config):
+    """Applies all cg modifications as a batch"""
 
 
     # Set base for output files
@@ -107,7 +107,6 @@ def deliver(ctx, input_folder, config_artic, config_case, config):
         caseID = caseinfo[0]["case_ID"]
     else:
         caseID = "artic"
-    prefix = "{}_{}".format(caseID, TIMESTAMP)
 
     resdir = input_folder
 
@@ -120,9 +119,95 @@ def deliver(ctx, input_folder, config_artic, config_case, config):
             timestamp=TIMESTAMP
         )
         delivery.rename_deliverables()
-        delivery.gen_delivery(prefix)
+        delivery.create_deliveryfile(prefix)
         delivery.create_fohm_csv()
 
+@sarscov2.command()
+@click.argument("input_folder")
+@click.option("--config_artic", help="Custom artic configuration file", default="{}/config/hasta/artic.json".format(WD))
+@click.option("--config_case", help="Provided config for the case", default="")
+@click.option("--config", help="General configuration file for MUTANT", default="")
+@click.pass_context
+def rename(ctx, input_folder, config_artic, config_case, config):
+    """Renames covid output to CG standard"""
+
+
+    # Set base for output files
+    if config_case != "":
+        caseinfo = get_json_data(config_case)
+        caseID = caseinfo[0]["case_ID"]
+    else:
+        caseID = "artic"
+
+    resdir = input_folder
+
+    # Deliverables
+    if config_case != "":
+        delivery = DeliverSC2(
+            caseinfo=caseinfo,
+            resdir=os.path.abspath(resdir),
+            config_artic=config_artic,
+            timestamp=TIMESTAMP
+        )
+        delivery.rename_deliverables()
+
+@sarscov2.command()
+@click.argument("input_folder")
+@click.option("--config_artic", help="Custom artic configuration file", default="{}/config/hasta/artic.json".format(WD))
+@click.option("--config_case", help="Provided config for the case", default="")
+@click.option("--config", help="General configuration file for MUTANT", default="")
+@click.pass_context
+def deliveryfile(ctx, input_folder, config_artic, config_case, config):
+    """Generates CG specific delivery file"""
+
+
+    # Set base for output files
+    if config_case != "":
+        caseinfo = get_json_data(config_case)
+        caseID = caseinfo[0]["case_ID"]
+    else:
+        caseID = "artic"
+
+    resdir = input_folder
+
+    # Deliverables
+    if config_case != "":
+        delivery = DeliverSC2(
+            caseinfo=caseinfo,
+            resdir=os.path.abspath(resdir),
+            config_artic=config_artic,
+            timestamp=TIMESTAMP
+        )
+        delivery.create_deliveryfile(prefix)
+
+@sarscov2.command()
+@click.argument("input_folder")
+@click.option("--config_artic", help="Custom artic configuration file", default="{}/config/hasta/artic.json".format(WD))
+@click.option("--config_case", help="Provided config for the case", default="")
+@click.option("--config", help="General configuration file for MUTANT", default="")
+@click.pass_context
+def fohmfile(ctx, input_folder, config_artic, config_case, config):
+    """Generates FoHM demanded delivery file"""
+
+
+    # Set base for output files
+    if config_case != "":
+        caseinfo = get_json_data(config_case)
+        caseID = caseinfo[0]["case_ID"]
+    else:
+        caseID = "artic"
+
+    resdir = input_folder
+
+    # Deliverables
+    if config_case != "":
+        delivery = DeliverSC2(
+            caseinfo=caseinfo,
+            resdir=os.path.abspath(resdir),
+            config_artic=config_artic,
+            timestamp=TIMESTAMP
+        )
+        delivery.create_fohm_csv()
 
 @toolbox.command()
 @click.argument("input_folder")
