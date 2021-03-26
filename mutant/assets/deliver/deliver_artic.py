@@ -1,16 +1,38 @@
 """ This script renames the output files for the ARTIC pipeline and Pangolin analysis,
-    and creates a deliverables file for Clinical Genomics Infrastructure"""
+    and creates a deliverables file for Clinical Genomics Infrastructure
 
+By: Isak Sylvin & Tanja Normark
+"""
+
+from datetime import date
+
+import csv
 import glob
 import os
-from datetime import date
+import json
 import yaml
-import csv
 
+
+def get_json_data(config):
+    if os.path.exists(config):
+        """Get sample information as json object"""
+        try:
+            with open(config) as json_file:
+                data = json.load(json_file)
+        except Exception as e:
+            click.echo("Unable to read provided json file: {}. Exiting..".format(config))
+            click.echo(e)
+            sys.exit(-1)
+    else:
+        click.echo("Could not find supplied config: {}. Exiting..".format(config))
+        sys.exit(-1)
+    return data
 
 class DeliverSC2:
 
     def __init__(self, caseinfo, resdir, config_artic, timestamp):
+        self.casefile = caseinfo
+        caseinfo = get_json_data(caseinfo)
 
         regionlab_list = []
         for record in caseinfo:
@@ -31,34 +53,44 @@ class DeliverSC2:
     def rename_deliverables(self):
         """Rename result files for delivery: fastq, consensus files, vcf and pangolin"""
 
-        prefix_fa = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(self.indir)
-        prefix_vcf = "{0}/ncovIllumina_Genotyping_typeVariants/vcf".format(self.indir)
-
         for sampleinfo in self.caseinfo:
             sample = sampleinfo["CG_ID_sample"]
-            region = sampleinfo["region_code"].replace(' ', '_')
-            lab = sampleinfo["lab_code"].replace(' ', '_')
+            region = sampleinfo["region_code"]
+            lab = sampleinfo["lab_code"]
 
-            #This will only resolve once
-            for item in glob.glob("{0}/*{1}*".format(prefix_fa, sample)):
-                orgpath = "{1}".format(prefix_fa, item)
-                newpath = "{0}/{1}_{2}_{3}.consensus.fasta".format(prefix_fa, region, lab, sampleinfo["Customer_ID_sample"])
-                os.rename(orgpath, newpath)
+            #rename makeConsensus
+            prefix = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(self.indir)
+            for item in glob.glob("{0}/*{1}*".format(prefix, sample)):
+                newpath = "{0}/{1}_{2}_{3}.consensus.fasta".format(prefix, region, lab, sampleinfo["Customer_ID_sample"])
+                os.rename(item, newpath)
 
-            #This will only resolve once
-            for item in glob.glob("{0}/*{1}*.csq.vcf".format(prefix_vcf, sample)):
-                orgpath = "{1}".format(prefix_vcf, item)
-                newpath = "{0}/{1}_{2}_{3}.vcf".format(prefix_vcf, region, lab, sampleinfo["Customer_ID_sample"])
-                os.rename(orgpath, newpath)
+            #rename typeVariants
+            prefix = "{0}/ncovIllumina_Genotyping_typeVariants/vcf".format(self.indir)
+            for item in glob.glob("{0}/*{1}*.csq.vcf".format(prefix, sample)):
+                newpath = "{0}/{1}_{2}_{3}.vcf".format(prefix, region, lab, sampleinfo["Customer_ID_sample"])
+                os.rename(item, newpath)
+
+            #rename callVariants
+            prefix = "{0}/ncovIllumina_sequenceAnalysis_callVariants".format(self.indir)
+            for item in glob.glob("{0}/*{1}*.variants.tsv".format(prefix, sample)):
+                newpath = "{0}/{1}_{2}_{3}.variants.tsv".format(prefix, region, lab, sampleinfo["Customer_ID_sample"])
+                os.rename(item, newpath)
+
+            #rename ReadMapping
+            prefix = "{0}/ncovIllumina_sequenceAnalysis_readMapping".format(self.indir)
+            for item in glob.glob("{0}/*{1}*.sorted.bam".format(prefix, sample)):
+                newpath = "{0}/{1}.sorted.bam".format(prefix, sampleinfo["Customer_ID_sample"])
+                os.rename(item, newpath)
+
+            #rename core
+            core_suffix = ['.qc.csv','.pangolin.csv','.typing_summary.csv','.variant_summary.csv']
+            for thing in core_suffix:
+                hit = glob.glob("{0}/*{1}".format(self.indir, thing))
+                if len(hit) == 1:
+                    hit=hit[0]
+                    os.rename(hit, "{0}/{1}{2}".format(self.indir, self.ticket, thing))
            
-            # Pangolin renaming
-            # pangolinRep = glob.glob(os.path.join(self.indir,
-            #                                     "ncovIllumina_sequenceAnalysis_makeConsensus/*pangolin.csv"))[0]
-            # new_pangolin = os.path.join(os.path.dirname(pangolinRep),
-            #                            "{}_{}_pangolin_classification.txt".format(base, self.today))
-            # os.rename(pangolinRep, new_pangolin)
-
-    def gen_delivery(self, prefix):
+    def create_deliveryfile(self):
 
         """Create deliverables file"""
 
@@ -70,23 +102,23 @@ class DeliverSC2:
 
         # Summary report
         deliv['files'].append({'format': 'csv', 'id': self.case,
-                               'path': "{}/sars-cov-2_{}_results_{}.csv".format(self.indir, self.ticket, self.today),
+                               'path': "{}/{}.typing_summary.csv".format(self.indir, self.ticket),
                                'path_index': '~', 'step': 'report', 'tag': 'SARS-CoV-2-sum'})
         # Variant report
         deliv['files'].append({'format': 'csv', 'id': self.case,
-                               'path': "{}/sars-cov-2_{}_variants_{}.csv".format(self.indir, self.ticket, self.today),
+                               'path': "{}/{}.variant_summary.csv".format(self.indir, self.ticket),
                                'path_index': '~', 'step': 'report', 'tag': 'SARS-CoV-2-var'})
         # QC report
         deliv['files'].append({'format': 'csv', 'id': self.case,
-                               'path': "{}/{}.qc.csv".format(self.indir, prefix),
+                               'path': "{}/{}.qc.csv".format(self.indir, self.ticket),
                                'path_index': '~', 'step': 'result_aggregation', 'tag': 'SARS-CoV-2-qc'})
         # Json (vogue) data
         deliv['files'].append({'format': 'json', 'id': self.case,
                                'path': "{}/{}.json".format(self.indir, self.case),
                                'path_index': '~', 'step': 'result_aggregation', 'tag': 'SARS-CoV-2-json'})
-        # Sampleinfo
+        # Sampleinfo/Case
         deliv['files'].append({'format': 'json', 'id': self.case,
-                               'path': "{}/{}_sampleinfo.json".format(self.indir, self.case),
+                               'path': "{}".format(self.casefile),
                                'path_index': '~', 'step': 'runinfo', 'tag': 'sampleinfo'})
         # Settings dump
         deliv['files'].append({'format': 'txt', 'id': self.case,
@@ -120,17 +152,16 @@ class DeliverSC2:
             sample = record["Customer_ID_sample"]
             region = record["region_code"].replace(' ', '_')
             lab = record["lab_code"].replace(' ', '_')
-            base = "{}_{}".format(region, lab)
-            base_sample = "{}_{}".format(base, sampleID)
+            base_sample = "{0}_{1}_{2}".format(region, lab, sample)
             # Concat reads forwards
             deliv['files'].append({'format': 'fastq', 'id': sampleID,
-                                   'path': "{0}/concat/{1}_1.fastq.gz".format(self.indir, base_sample),
+                                   'path': "{0}/ncovIllumina_sequenceConcatination/{1}_1.fastq.gz".format(self.indir, base_sample),
                                    'path_index': '~', 'step': 'concatination', 'tag': 'forward-reads'})
             # Concat reads reverse
             deliv['files'].append({'format': 'fastq', 'id': sampleID,
-                                   'path': "{0}/concat/{1}_2.fastq.gz".format(self.indir, base_sample),
+                                   'path': "{0}/ncovIllumina_sequenceConcatination/{1}_2.fastq.gz".format(self.indir, base_sample),
                                    'path_index': '~', 'step': 'concatination', 'tag': 'reverse-reads'})
-            # Consensus file
+            # Consensus files
             deliv['files'].append({'format': 'fasta', 'id': sampleID,
                                    'path': "{}/ncovIllumina_sequenceAnalysis_makeConsensus/{}.consensus.fasta"
                                    .format(self.indir, base_sample),
@@ -159,13 +190,17 @@ class DeliverSC2:
 
         # Add header to summary files
         for regionlab in self.regionlabs:
-            sumfile = os.path.join(self.indir, "{}_{}_komplettering.csv".format(regionlab, self.today))
+            sumfile = os.path.join(self.indir, "{}_{}_komplettering.csv".format(regionlab.replace(' ', '_'), self.today))
             with open(sumfile, "w") as summary:
                 summary.write("provnummer,urvalskriterium,GISAID_accession\n")
+
         # Write sample information to corresponding summary file
         for record in self.caseinfo:
-            sumfile = os.path.join(self.indir, "{}_{}_{}_komplettering.csv".format(record["region_code"],
-                                                                                   record["lab_code"], self.today))
+            region = record["region_code"].replace(' ', '_')
+            lab = record["lab_code"].replace(' ', '_')
+            sumfile = os.path.join(self.indir, "{}_{}_{}_komplettering.csv".format(region, lab, self.today))
             with open(sumfile, "a") as out:
                 summary = csv.writer(out)
-                summary.writerow([record["Customer_ID_sample"], record["selection_criteria"].split(".")[1].strip()])
+                summary.writerow([record["Customer_ID_sample"], record["selection_criteria"].split(".")[1].strip())
+
+
