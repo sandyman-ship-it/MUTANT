@@ -201,6 +201,6 @@ class DeliverSC2:
             sumfile = os.path.join(self.indir, "{}_{}_{}_komplettering.csv".format(region, lab, self.today))
             with open(sumfile, "a") as out:
                 summary = csv.writer(out)
-                summary.writerow([record["Customer_ID_sample"], record["selection_criteria"]])
+                summary.writerow([record["Customer_ID_sample"], record["selection_criteria"].split(".")[1].strip())
 
 

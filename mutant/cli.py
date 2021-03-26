@@ -7,6 +7,7 @@
 import os
 import sys
 import re
+import json
 import click
 import subprocess
 from datetime import datetime
@@ -34,14 +35,6 @@ def get_json_data(config):
         sys.exit(-1)
     return data
 
-def get_sarscov2_config(config):
-    """Parse SARS-CoV-2 sample config"""
-    caseinfo = get_json_data(config)
-    for i in range(len(caseinfo)):
-        caseinfo[i]["region_code"] = caseinfo[i]["region_code"].split()[0]
-        caseinfo[i]["lab_code"] = caseinfo[i]["lab_code"].split()[0]
-    return caseinfo
-
 @click.group()
 @click.version_option(version)
 @click.pass_context
@@ -66,7 +59,7 @@ def sarscov2(ctx, input_folder, config_artic, config_case, config_mutant, outdir
 
     # Set base for output files (Move this section)
     if config_case != "":
-        caseinfo = get_sarscov2_config(config_case)
+        caseinfo = get_json_data(config_case)
         caseID = caseinfo[0]["case_ID"]
     else:
         caseID = "artic"
