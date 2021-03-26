@@ -7,6 +7,7 @@ import click
 import json
 import subprocess
 from mutant import version, log
+from mutant.assets.utils.parse import get_json
 
 class RunSC2:
 
@@ -21,32 +22,22 @@ class RunSC2:
         self.profiles = profiles
 
     def get_results_dir(self, config, outdir):
+
+        """Return result output directory"""
+
         if outdir != "":
             resdir = outdir
         elif config != "":
-            general_config = self.get_json_data(config)
+            general_config = get_json(config)
             resdir = os.path.join(general_config["SARS-CoV-2"]["folders"]["results"], "{}_{}".format(
                 self.case, self.timestamp))
         else:
             resdir = "results"
         return resdir
 
-    def get_json_data(self, config):
-        if os.path.exists(config):
-            """Get sample information as json object"""
-            try:
-                with open(config) as json_file:
-                    data = json.load(json_file)
-            except Exception as e:
-                click.echo("Unable to read provided json file: {}. Exiting..".format(config))
-                click.echo(e)
-                sys.exit(-1)
-        else:
-            click.echo("Could not find supplied config: {}. Exiting..".format(config))
-            sys.exit(-1)
-        return data
-
     def run_case(self, resdir):
+
+        """Run SARS-CoV-2 analysis"""
 
         resultsline = "--outdir {}".format(resdir)
         workline = "-work-dir {}".format(os.path.join(resdir, "work"))

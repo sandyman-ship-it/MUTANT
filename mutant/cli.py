@@ -8,24 +8,17 @@ import os
 import sys
 import re
 import click
-import json
 import subprocess
 from datetime import datetime
 from mutant import version, log
 from mutant.assets.deliver.deliver_artic import DeliverSC2
 from mutant.assets.run.run_artic import RunSC2
+from mutant.assets.utils.parse import get_sarscov2_config
 
 #File work directory
 WD = os.path.dirname(os.path.realpath(__file__))
 TIMESTAMP = datetime.now().strftime("%y%m%d-%H%M%S")
 
-def get_sarscov2_config(config):
-    """Parse SARS-CoV-2 sample config"""
-    caseinfo = get_json_data(config)
-    for i in range(len(caseinfo)):
-        caseinfo[i]["region_code"] = caseinfo[i]["region_code"].split()[0]
-        caseinfo[i]["lab_code"] = caseinfo[i]["lab_code"].split()[0]
-    return caseinfo
 
 @click.group()
 @click.version_option(version)
@@ -49,9 +42,9 @@ def analyse(ctx):
 @click.pass_context
 def sarscov2(ctx, input_folder, config_artic, config_case, config_mutant, outdir, profiles):
 
-    # Set base for output files
+    # Set base for output files (Move this section)
     if config_case != "":
-        caseinfo = get_json_data(config_case)
+        caseinfo = get_sarscov2_config(config_case)
         caseID = caseinfo[0]["case_ID"]
     else:
         caseID = "artic"
@@ -79,7 +72,7 @@ def sarscov2(ctx, input_folder, config_artic, config_case, config_mutant, outdir
             timestamp=TIMESTAMP
         )
         delivery.rename_deliverables()
-        delivery.create_deliveryfile(prefix)
+        delivery.create_deliveryfile()
         delivery.create_fohm_csv()
 
 
@@ -110,7 +103,7 @@ def cgmodifications(ctx, input_folder, config_artic, config_case):
 
     # Set base for output files
     if config_case != "":
-        caseinfo = get_json_data(config_case)
+        caseinfo = get_sarscov2_config(config_case)
         caseID = caseinfo[0]["case_ID"]
     else:
         caseID = "artic"
@@ -139,7 +132,7 @@ def rename(ctx, input_folder, config_artic, config_case):
 
     # Set base for output files
     if config_case != "":
-        caseinfo = get_json_data(config_case)
+        caseinfo = get_sarscov2_config(config_case)
         caseID = caseinfo[0]["case_ID"]
     else:
         caseID = "artic"
@@ -168,7 +161,7 @@ def deliveryfile(ctx, input_folder, config_artic, config_case):
 
     # Set base for output files
     if config_case != "":
-        caseinfo = get_json_data(config_case)
+        caseinfo = get_sarscov2_config(config_case)
         caseID = caseinfo[0]["case_ID"]
     else:
         caseID = "artic"
@@ -196,7 +189,7 @@ def fohmfile(ctx, input_folder, config_artic, config_case):
 
     # Set base for output files
     if config_case != "":
-        caseinfo = get_json_data(config_case)
+        caseinfo = get_sarscov2_config(config_case)
         caseID = caseinfo[0]["case_ID"]
     else:
         caseID = "artic"
@@ -222,18 +215,3 @@ def ArticReport(input_folder, ticket_number):
     log.debug("Command ran: {}".format(cmd))
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
-
-def get_json_data(config):
-    if os.path.exists(config):
-        """Get sample information as json object"""
-        try:
-            with open(config) as json_file:
-                data = json.load(json_file)
-        except Exception as e:
-            click.echo("Unable to read provided json file: {}. Exiting..".format(config))
-            click.echo(e)
-            sys.exit(-1)
-    else:
-        click.echo("Could not find supplied config: {}. Exiting..".format(config))
-        sys.exit(-1)
-    return data
