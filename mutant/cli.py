@@ -116,7 +116,7 @@ def get_json_data(config):
 @click.argument("app_tag")
 @click.pass_context
 def concatenate(input_folder, app_tag):
-    """ Concatenates the hard linked files in a customer inbox if needed """
+    """ Concatenates fastq files if needed """
     cmd = "python {0}/assets/concatenate.py {1} {2}".format(WD, input_folder, app_tag)
     log.debug("Command ran: {}".format(cmd))
     proc = subprocess.Popen(cmd.split())

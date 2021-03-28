@@ -1,32 +1,37 @@
-""" This script concatenates all forward fastq files into one file
-    and all reverse fastq files into one file for each sample
+""" This script concatenates all forward fastq files into one file and
+    all reverse fastq files into one file for each sample. The files
+    that are used for concatenation will be removed afterwards if they
+    got more than 1 inode.
     By: @henningonsbring """
 
 import os
 import re
+import subprocess
 import sys
 
 from pathlib import Path
 
 
-if len(sys.argv) != 3:
-    print("Usage: concatenate.py <input_folder> <app_tag>")
+if len(sys.argv) > 3 or len(sys.argv) < 2:
+    print("Usage: concatenate.py <input_folder> <app_tag> OR concatenate.py <input_folder>")
     sys.exit(-1)
 
 base_path = sys.argv[1]
-app_tag = sys.argv[2]
 
-PREFIX_TO_CONCATENATE = ["MWG", "MWL", "MWM", "MWR", "MWX", "VWG", "VWL", "VWM"]
-should_concatenate = False
+if len(sys.argv) == 3:
+    app_tag = sys.argv[2]
 
-for prefix in PREFIX_TO_CONCATENATE:
-    if app_tag.startswith(prefix):
-        print("Apptag " + app_tag + " identified, data generated with this application tag should be concatenated")
-        should_concatenate = True
+    PREFIX_TO_CONCATENATE = ["MWG", "MWL", "MWM", "MWR", "MWX", "VWG", "VWL", "VWM"]
+    should_concatenate = False
 
-if should_concatenate == False:
-    print("Data with application tag " + app_tag + " should not be concatenated, skipping concatenation")
-    sys.exit(-1)
+    for prefix in PREFIX_TO_CONCATENATE:
+        if app_tag.startswith(prefix):
+            print("Apptag " + app_tag + " identified, data generated with this application tag should be concatenated")
+            should_concatenate = True
+
+    if should_concatenate == False:
+        print("Data with application tag " + app_tag + " should not be concatenated, skipping concatenation")
+        sys.exit(-1)
 
 for dir_name in os.listdir(base_path):
     for read_direction in [1, 2]:
@@ -54,7 +59,12 @@ for dir_name in os.listdir(base_path):
         if total_size == concatenated_size:
             print("QC PASSED: Total size for files used in concatenation match the size of the concatenated file")
             for file in same_direction:
-                print("Removing file: " + file)
-                os.remove(file)
+                inode_check_cmd = "stat -c %h " + file
+                n_inodes = subprocess.getoutput(inode_check_cmd)
+                if int(n_inodes) > 1:
+                    print("Removing file: " + file)
+                    os.remove(file)
+                else:
+                    print("WARNING " + file + " only got 1 inode, file will not be removed")
         else:
             print("WARNING data lost in concatenation")
