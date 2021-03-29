@@ -66,6 +66,8 @@ class DeliverSC2:
             region = sampleinfo["region_code"].replace(" ", "_")
             lab = sampleinfo["lab_code"].replace(" ", "_")
             base_sample = "{0}_{1}_{2}".format(region, lab, sampleinfo["Customer_ID_sample"])
+            if not sampleinfo["sequencing_qc_pass"]:
+                continue
 
             # rename makeConsensus
             prefix = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(self.indir)
@@ -249,6 +251,8 @@ class DeliverSC2:
             region = record["region_code"].replace(" ", "_")
             lab = record["lab_code"].replace(" ", "_")
             base_sample = "{0}_{1}_{2}".format(region, lab, sample)
+            if not record["sequencing_qc_pass"]:
+                continue
             # Concat reads forwards
             deliv["files"].append(
                 {
