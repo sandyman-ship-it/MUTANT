@@ -55,8 +55,8 @@ class DeliverSC2:
 
         for sampleinfo in self.caseinfo:
             sample = sampleinfo["CG_ID_sample"]
-            region = sampleinfo["region_code"]
-            lab = sampleinfo["lab_code"]
+            region = sampleinfo["region_code"].replace(' ', '_')
+            lab = sampleinfo["lab_code"].replace(' ', '_')
 
             #rename makeConsensus
             prefix = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(self.indir)
