@@ -10,6 +10,7 @@ import csv
 import glob
 import os
 import json
+from pathlib import Path
 
 import click
 import yaml
@@ -56,6 +57,10 @@ class DeliverSC2:
     def rename_deliverables(self):
         """Rename result files for delivery: fastq, consensus files, vcf and pangolin"""
 
+        Path("{0}/ncovIllumina_sequenceConcatination/".format(self.indir)).mkdir(
+            exist_ok=True, parents=True
+        )
+
         for sampleinfo in self.caseinfo:
             sample = sampleinfo["CG_ID_sample"]
             region = sampleinfo["region_code"].replace(" ", "_")
@@ -98,13 +103,13 @@ class DeliverSC2:
                 newpath = "{0}/ncovIllumina_sequenceConcatination/{1}_1.fastq.gz".format(
                     self.indir, base_sample
                 )
-                os.rename(item, newpath)
+                os.symlink(item, newpath)
 
             for item in glob.glob("{0}/*{1}_*_2*".format(prefix, sample)):
                 newpath = "{0}/ncovIllumina_sequenceConcatination/{1}_2.fastq.gz".format(
                     self.indir, base_sample
                 )
-                os.rename(item, newpath)
+                os.symlink(item, newpath)
 
             # rename core
             core_suffix = [
