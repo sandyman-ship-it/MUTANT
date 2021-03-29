@@ -160,6 +160,7 @@ def rename(ctx, input_folder, config_artic, config_case):
         delivery = DeliverSC2(
             caseinfo=config_case,
             resdir=os.path.abspath(input_folder),
+            fastq_dir=os.path.abspath(input_folder),
             config_artic=config_artic,
             timestamp=TIMESTAMP,
         )
@@ -183,6 +184,7 @@ def deliveryfile(ctx, input_folder, config_artic, config_case):
         delivery = DeliverSC2(
             caseinfo=config_case,
             resdir=os.path.abspath(input_folder),
+            fastq_dir=os.path.abspath(input_folder),
             config_artic=config_artic,
             timestamp=TIMESTAMP,
         )
@@ -206,6 +208,7 @@ def fohmfile(ctx, input_folder, config_artic, config_case):
         delivery = DeliverSC2(
             caseinfo=config_case,
             resdir=os.path.abspath(input_folder),
+            fastq_dir=os.path.abspath(input_folder),
             config_artic=config_artic,
             timestamp=TIMESTAMP,
         )
