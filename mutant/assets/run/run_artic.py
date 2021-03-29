@@ -54,7 +54,7 @@ class RunSC2:
         log.info(out)
         log.info(err)
 
-   def get_json_data(self, config):
+    def get_json_data(self, config):
         if os.path.exists(config):
             """Get sample information as json object"""
             try:
