@@ -9,6 +9,7 @@ import re
 import subprocess
 import sys
 
+from datetime import date
 from pathlib import Path
 
 
@@ -26,11 +27,11 @@ if len(sys.argv) == 3:
 
     for prefix in PREFIX_TO_CONCATENATE:
         if app_tag.startswith(prefix):
-            print("Apptag " + app_tag + " identified, data generated with this application tag should be concatenated")
+            print("Apptag %s identified, data generated with this application tag should be concatenated" % (app_tag))
             should_concatenate = True
 
     if should_concatenate == False:
-        print("Data with application tag " + app_tag + " should not be concatenated, skipping concatenation")
+        print("Data with application tag %s should not be concatenated, skipping concatenation" % (app_tag))
         sys.exit(-1)
 
 for dir_name in os.listdir(base_path):
@@ -51,9 +52,11 @@ for dir_name in os.listdir(base_path):
         cmd = "cat"
         for i in range(len(same_direction)):
             cmd = cmd + " " + same_direction[i]
-        output = dir_path + "/" + dir_name + "_R" + str(read_direction) + ".fastq.gz"
+        today = date.today()
+        today_formatted = today.strftime("%y%m%d")
+        output = dir_path + "/" + today_formatted + "_" + dir_name + "_" + str(read_direction) + ".fastq.gz"
         cmd = cmd + " > " + output
-        print("Running command: " + cmd)
+        print("Running command: %s" % (cmd))
         os.system(cmd)
         concatenated_size = Path(output).stat().st_size
         if total_size == concatenated_size:
@@ -62,9 +65,10 @@ for dir_name in os.listdir(base_path):
                 inode_check_cmd = "stat -c %h " + file
                 n_inodes = subprocess.getoutput(inode_check_cmd)
                 if int(n_inodes) > 1:
-                    print("Removing file: " + file)
+                    print("Removing file: %s" % (file))
                     os.remove(file)
                 else:
                     print("WARNING " + file + " only got 1 inode, file will not be removed")
+                    print("WARNING %s only got 1 inode, file will not be removed" % (file))
         else:
             print("WARNING data lost in concatenation")
