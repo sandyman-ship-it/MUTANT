@@ -51,7 +51,7 @@ def analyse(ctx):
 @click.argument("input_folder")
 @click.option("--config_artic", help="Custom artic configuration file", default="{}/config/hasta/artic.json".format(WD))
 @click.option("--config_case", help="Provided config for the case", default="")
-@click.option("--config_mutant", help="General configuration file for MUTANT", default="")
+@click.option("--config_mutant", help="General configuration file for MUTANT", default="{}/config/hasta/mutant.json".format(WD))
 @click.option("--outdir", help="Output folder to override general configutations", default="")
 @click.option("--profiles", help="Execution profiles, comma-separated", default="singularity,slurm")
 @click.pass_context
