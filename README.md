@@ -22,7 +22,7 @@ MUTANTs versioning is bumped manually post PR merge, using [semver](https://semv
 
 ## Deployment
 
-`cd /home/proj/INSTANCE/mutant/MUTANT`
-`git pull origin main`
-`source activate INSTANCEPREFIX_mutant`
-`pip install .`
+* `cd /home/proj/INSTANCE/mutant/MUTANT`
+* `git pull origin main`
+* `source activate INSTANCEPREFIX_mutant`
+* `pip install .`
