@@ -68,7 +68,6 @@ for dir_name in os.listdir(base_path):
                     print("Removing file: %s" % (file))
                     os.remove(file)
                 else:
-                    print("WARNING " + file + " only got 1 inode, file will not be removed")
                     print("WARNING %s only got 1 inode, file will not be removed" % (file))
         else:
             print("WARNING data lost in concatenation")
