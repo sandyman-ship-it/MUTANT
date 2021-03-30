@@ -18,4 +18,4 @@ Add the MUTANT directory to your path. Execute using:
 
 ## Version bumping
 
-MUTANTs versioning is bumped manually post PR merge, using (semver)[https://semver.org/] standards on [this](https://github.com/Clinical-Genomics/MUTANT/blob/main/mutant/__init__.py#L3) variable.
+MUTANTs versioning is bumped manually post PR merge, using [semver](https://semver.org/) standards on [this](https://github.com/Clinical-Genomics/MUTANT/blob/main/mutant/__init__.py#L3) variable.
