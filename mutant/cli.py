@@ -7,17 +7,33 @@
 import os
 import sys
 import re
-import click
 import json
+import click
 import subprocess
 from datetime import datetime
 from mutant import version, log
 from mutant.assets.deliver.deliver_artic import DeliverSC2
 from mutant.assets.run.run_artic import RunSC2
+from mutant.assets.utils.parse import get_sarscov2_config
 
 #File work directory
 WD = os.path.dirname(os.path.realpath(__file__))
 TIMESTAMP = datetime.now().strftime("%y%m%d-%H%M%S")
+
+def get_json_data(config):
+    if os.path.exists(config):
+        """Get sample information as json object"""
+        try:
+            with open(config) as json_file:
+                data = json.load(json_file)
+        except Exception as e:
+            click.echo("Unable to read provided json file: {}. Exiting..".format(config))
+            click.echo(e)
+            sys.exit(-1)
+    else:
+        click.echo("Could not find supplied config: {}. Exiting..".format(config))
+        sys.exit(-1)
+    return data
 
 @click.group()
 @click.version_option(version)
@@ -35,13 +51,13 @@ def analyse(ctx):
 @click.argument("input_folder")
 @click.option("--config_artic", help="Custom artic configuration file", default="{}/config/hasta/artic.json".format(WD))
 @click.option("--config_case", help="Provided config for the case", default="")
-@click.option("--config", help="General configuration file for MUTANT", default="")
+@click.option("--config_mutant", help="General configuration file for MUTANT", default="")
 @click.option("--outdir", help="Output folder to override general configutations", default="")
 @click.option("--profiles", help="Execution profiles, comma-separated", default="singularity,slurm")
 @click.pass_context
-def sarscov2(ctx, input_folder, config_artic, config_case, config, outdir, profiles):
+def sarscov2(ctx, input_folder, config_artic, config_case, config_mutant, outdir, profiles):
 
-    # Set base for output files
+    # Set base for output files (Move this section)
     if config_case != "":
         caseinfo = get_json_data(config_case)
         caseID = caseinfo[0]["case_ID"]
@@ -59,22 +75,21 @@ def sarscov2(ctx, input_folder, config_artic, config_case, config, outdir, profi
         timestamp=TIMESTAMP,
         WD=WD
     )
-    resdir = run.get_results_dir(config, outdir)
+    resdir = run.get_results_dir(config_mutant, outdir)
     run.run_case(resdir)
 
     # Deliverables
     if config_case != "":
         delivery = DeliverSC2(
-            caseinfo=caseinfo,
+            caseinfo=config_case,
             resdir=os.path.abspath(resdir),
             config_artic=config_artic,
             timestamp=TIMESTAMP
         )
         delivery.rename_deliverables()
-        delivery.gen_delivery(prefix)
+        delivery.create_deliveryfile()
         delivery.create_fohm_csv()
 
-    print("Done")
 
 @analyse.command()
 @click.pass_context
@@ -86,30 +101,97 @@ def jasen(ctx):
 def toolbox(ctx):
     pass
 
+@toolbox.group()
+@click.pass_context
+def sarscov2(ctx):
+    pass
+
+
+@sarscov2.command()
+@click.argument("input_folder")
+@click.option("--config_artic", help="Custom artic configuration file", default="{}/config/hasta/artic.json".format(WD))
+@click.option("--config_case", help="Provided config for the case", required=True)
+@click.pass_context
+def cgmodifications(ctx, input_folder, config_artic, config_case):
+    """Applies all cg modifications as a batch"""
+
+
+    # Deliverables
+    if config_case != "":
+        delivery = DeliverSC2(
+            caseinfo=config_case,
+            resdir=os.path.abspath(input_folder),
+            config_artic=config_artic,
+            timestamp=TIMESTAMP
+        )
+        delivery.rename_deliverables()
+        delivery.create_deliveryfile()
+        delivery.create_fohm_csv()
+
+@sarscov2.command()
+@click.argument("input_folder")
+@click.option("--config_artic", help="Custom artic configuration file", default="{}/config/hasta/artic.json".format(WD))
+@click.option("--config_case", help="Provided config for the case", required=True)
+@click.pass_context
+def rename(ctx, input_folder, config_artic, config_case):
+    """Renames covid output to CG standard"""
+
+    # Deliverables
+    if config_case != "":
+        delivery = DeliverSC2(
+            caseinfo=config_case,
+            resdir=os.path.abspath(input_folder),
+            config_artic=config_artic,
+            timestamp=TIMESTAMP
+        )
+        delivery.rename_deliverables()
+
+@sarscov2.command()
+@click.argument("input_folder")
+@click.option("--config_artic", help="Custom artic configuration file", default="{}/config/hasta/artic.json".format(WD))
+@click.option("--config_case", help="Provided config for the case", required=True)
+@click.pass_context
+def deliveryfile(ctx, input_folder, config_artic, config_case):
+    """Generates CG specific delivery file"""
+
+    # Deliverables
+    if config_case != "":
+        delivery = DeliverSC2(
+            caseinfo=config_case,
+            resdir=os.path.abspath(input_folder),
+            config_artic=config_artic,
+            timestamp=TIMESTAMP
+        )
+        delivery.create_deliveryfile()
+
+@sarscov2.command()
+@click.argument("input_folder")
+@click.option("--config_artic", help="Custom artic configuration file", default="{}/config/hasta/artic.json".format(WD))
+@click.option("--config_case", help="Provided config for the case", required=True)
+@click.pass_context
+def fohmfile(ctx, input_folder, config_artic, config_case):
+    """Generates FoHM demanded delivery file"""
+
+
+    # Deliverables
+    if config_case != "":
+        delivery = DeliverSC2(
+            caseinfo=config_case,
+            resdir=os.path.abspath(input_folder),
+            config_artic=config_artic,
+            timestamp=TIMESTAMP
+        )
+        delivery.create_fohm_csv()
+
 @toolbox.command()
 @click.argument("input_folder")
 @click.argument("ticket_number")
 def ArticReport(input_folder, ticket_number):
-    """ Custom report from the QC output of the ARTIC pipeline, applied on SARS-CoV-2 samples """
+    """Report for QC output of the ARTIC pipeline"""
     cmd = "python {0}/assets/artic_report.py {1} {2}".format(WD, input_folder, ticket_number)
     log.debug("Command ran: {}".format(cmd))
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
-
-def get_json_data(config):
-    if os.path.exists(config):
-        """Get sample information as json object"""
-        try:
-            with open(config) as json_file:
-                data = json.load(json_file)
-        except Exception as e:
-            click.echo("Unable to read provided json file: {}. Exiting..".format(config))
-            click.echo(e)
-            sys.exit(-1)
-    else:
-        click.echo("Could not find supplied config: {}. Exiting..".format(config))
-        sys.exit(-1)
-    return data
 
 @toolbox.command()
 @click.argument("input_folder")

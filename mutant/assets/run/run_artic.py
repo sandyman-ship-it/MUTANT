@@ -7,6 +7,7 @@ import click
 import json
 import subprocess
 from mutant import version, log
+from mutant.assets.utils.parse import get_json
 
 class RunSC2:
 
@@ -21,6 +22,9 @@ class RunSC2:
         self.profiles = profiles
 
     def get_results_dir(self, config, outdir):
+
+        """Return result output directory"""
+
         if outdir != "":
             resdir = outdir
         elif config != "":
@@ -30,6 +34,25 @@ class RunSC2:
         else:
             resdir = "results"
         return resdir
+
+    def run_case(self, resdir):
+
+        """Run SARS-CoV-2 analysis"""
+
+        resultsline = "--outdir {}".format(resdir)
+        workline = "-work-dir {}".format(os.path.join(resdir, "work"))
+        nflog = os.path.join(resdir, "nextflow.log")
+        confline = ""
+        if self.config_artic != "":
+            confline = "-C {0}".format(self.config_artic)
+
+        cmd = 'nextflow {0} -log {1} run {2} {3}/externals/ncov2019-artic-nf/main.nf -profile {4} --illumina --prefix {5} ' \
+              '--directory {6} {7}'.format(confline, nflog, workline, self.WD, self.profiles, self.prefix, self.fastq, resultsline)
+        log.debug("Command ran: {}".format(cmd))
+        proc = subprocess.Popen(cmd.split())
+        out, err = proc.communicate()
+        log.info(out)
+        log.info(err)
 
     def get_json_data(self, config):
         if os.path.exists(config):
@@ -46,19 +69,4 @@ class RunSC2:
             sys.exit(-1)
         return data
 
-    def run_case(self, resdir):
 
-        resultsline = "--outdir {}".format(resdir)
-        workline = "-work-dir {}".format(os.path.join(resdir, "work"))
-        nflog = os.path.join(resdir, "nextflow.log")
-        confline = ""
-        if self.config_artic != "":
-            confline = "-C {0}".format(self.config_artic)
-
-        cmd = 'nextflow {0} -log {1} run {2} {3}/externals/ncov2019-artic-nf/main.nf -profile {4} --illumina --prefix {5} ' \
-              '--directory {6} {7}'.format(confline, nflog, workline, self.WD, self.profiles, self.prefix, self.fastq, resultsline)
-        log.debug("Command ran: {}".format(cmd))
-        proc = subprocess.Popen(cmd.split())
-        out, err = proc.communicate()
-        log.info(out)
-        log.info(err)

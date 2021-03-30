@@ -50,8 +50,8 @@ def get_results(indir, voc_strain, voc_pos, voc_pos_aa):
         content = csv.reader(f)
         next(content)
         for line in content:
-            #sample = line[0].split("_")[2]
-            sample = line[0]        ####TEMPSTUFF
+            sample = line[0].split("_")[2]
+            #sample = line[0]        ####TEMPSTUFF
             if float(line[2]) > 95:
                 passed = "TRUE"
             else:
@@ -63,8 +63,8 @@ def get_results(indir, voc_strain, voc_pos, voc_pos_aa):
         content = csv.reader(f)
         next(content)
         for line in content:
-            #sample = line[0].split("_")[3].split(".")[0]
-            sample = line[0].split("_")[1].split(".")[0]        ####TEMPSTUFF
+            sample = line[0].split("_")[3].split(".")[0]
+            #sample = line[0].split("_")[1].split(".")[0]        ####TEMPSTUFF
             lineage = line[1]
             if lineage in voc_strain:
                 voc = "Yes"
@@ -99,7 +99,10 @@ def get_results(indir, voc_strain, voc_pos, voc_pos_aa):
     if var_all:
         for sample in artic_data.keys():
             if sample in var_all.keys():
-                artic_data[sample].update({"variants": ";".join([var_all[sample]])})
+                if len(var_all[sample]) > 1:
+                    artic_data[sample].update({"variants": ";".join(var_all[sample])})
+                else:
+                    artic_data[sample].update({"variants": var_all[sample]})
             else:
                 artic_data[sample].update({"variants": "-"})
     return artic_data
@@ -111,7 +114,7 @@ def write_summary_report(results, ticket, today):
     summaryfile = os.path.join(indir, "sars-cov-2_{}_results_{}.csv".format(ticket, today))
     with open(summaryfile, mode='w') as out:
         summary = csv.writer(out)
-        summary.writerow(["Sample", "Selection", "Ticket", "%N_bases", "%Covered_bases", "QC_pass", "Lineage",
+        summary.writerow(["Sample", "Selection", "Ticket", "%N_bases", "%10X_coverage", "QC_pass", "Lineage",
                           "PangoLEARN_version", "VOC", "Variants"])
         for sample, data in results.items():
             selection = "-"
