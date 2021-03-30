@@ -75,7 +75,7 @@ class DeliverSC2:
                 newpath = "{0}/{1}_{2}_{3}.consensus.fasta".format(
                     prefix, region, lab, sampleinfo["Customer_ID_sample"]
                 )
-                os.rename(item, newpath)
+                os.symlink(item, newpath)
 
             # rename typeVariants
             prefix = "{0}/ncovIllumina_Genotyping_typeVariants/vcf".format(self.indir)
@@ -83,7 +83,7 @@ class DeliverSC2:
                 newpath = "{0}/{1}_{2}_{3}.vcf".format(
                     prefix, region, lab, sampleinfo["Customer_ID_sample"]
                 )
-                os.rename(item, newpath)
+                os.symlink(item, newpath)
 
             # rename callVariants
             prefix = "{0}/ncovIllumina_sequenceAnalysis_callVariants".format(self.indir)
@@ -91,13 +91,13 @@ class DeliverSC2:
                 newpath = "{0}/{1}_{2}_{3}.variants.tsv".format(
                     prefix, region, lab, sampleinfo["Customer_ID_sample"]
                 )
-                os.rename(item, newpath)
+                os.symlink(item, newpath)
 
             # rename ReadMapping
             prefix = "{0}/ncovIllumina_sequenceAnalysis_readMapping".format(self.indir)
             for item in glob.glob("{0}/*{1}_*.sorted.bam".format(prefix, sample)):
                 newpath = "{0}/{1}.sorted.bam".format(prefix, sampleinfo["Customer_ID_sample"])
-                os.rename(item, newpath)
+                os.symlink(item, newpath)
 
             # rename fastq
             prefix = self.fastq_dir
@@ -124,7 +124,7 @@ class DeliverSC2:
                 hit = glob.glob("{0}/*{1}".format(self.indir, thing))
                 if len(hit) == 1:
                     hit = hit[0]
-                    os.rename(hit, "{0}/{1}{2}".format(self.indir, self.ticket, thing))
+                    os.symlink(hit, "{0}/{1}{2}".format(self.indir, self.ticket, thing))
 
     def create_deliveryfile(self):
 
