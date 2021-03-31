@@ -257,7 +257,7 @@ class DeliverSC2:
                     "format": "bam",
                     "id": sampleID,
                     "path": "{}/ncovIllumina_sequenceAnalysis_readMapping/{}.sorted.bam".format(
-                        self.indir, sample
+                        self.indir, base_sample
                     ),
                     "path_index": "~",
                     "step": "alignment",
