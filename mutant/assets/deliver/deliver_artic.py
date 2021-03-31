@@ -10,7 +10,6 @@ import csv
 import glob
 import os
 import json
-from pathlib import Path
 
 import click
 import yaml
@@ -57,10 +56,6 @@ class DeliverSC2:
     def rename_deliverables(self):
         """Rename result files for delivery: fastq, consensus files, vcf and pangolin"""
 
-        Path("{0}/ncovIllumina_sequenceConcatination/".format(self.indir)).mkdir(
-            exist_ok=True, parents=True
-        )
-
         for sampleinfo in self.caseinfo:
             sample = sampleinfo["CG_ID_sample"]
             region = sampleinfo["region_code"].replace(" ", "_")
@@ -71,46 +66,14 @@ class DeliverSC2:
 
             # rename makeConsensus
             prefix = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(self.indir)
-            for item in glob.glob("{0}/*{1}_*".format(prefix, sample)):
-                newpath = "{0}/{1}_{2}_{3}.consensus.fasta".format(
-                    prefix, region, lab, sampleinfo["Customer_ID_sample"]
-                )
+            for item in glob.glob("{0}/{1}*".format(prefix, base_sample)):
+                newpath = "{0}/{1}.consensus.fasta".format(prefix, base_sample)
                 os.symlink(item, newpath)
 
             # rename typeVariants
             prefix = "{0}/ncovIllumina_Genotyping_typeVariants/vcf".format(self.indir)
-            for item in glob.glob("{0}/*{1}_*.csq.vcf".format(prefix, sample)):
-                newpath = "{0}/{1}_{2}_{3}.vcf".format(
-                    prefix, region, lab, sampleinfo["Customer_ID_sample"]
-                )
-                os.symlink(item, newpath)
-
-            # rename callVariants
-            prefix = "{0}/ncovIllumina_sequenceAnalysis_callVariants".format(self.indir)
-            for item in glob.glob("{0}/*{1}_*.variants.tsv".format(prefix, sample)):
-                newpath = "{0}/{1}_{2}_{3}.variants.tsv".format(
-                    prefix, region, lab, sampleinfo["Customer_ID_sample"]
-                )
-                os.symlink(item, newpath)
-
-            # rename ReadMapping
-            prefix = "{0}/ncovIllumina_sequenceAnalysis_readMapping".format(self.indir)
-            for item in glob.glob("{0}/*{1}_*.sorted.bam".format(prefix, sample)):
-                newpath = "{0}/{1}.sorted.bam".format(prefix, sampleinfo["Customer_ID_sample"])
-                os.symlink(item, newpath)
-
-            # rename fastq
-            prefix = self.fastq_dir
-            for item in glob.glob("{0}/*{1}_*_1*".format(prefix, sample)):
-                newpath = "{0}/ncovIllumina_sequenceConcatination/{1}_1.fastq.gz".format(
-                    self.indir, base_sample
-                )
-                os.symlink(item, newpath)
-
-            for item in glob.glob("{0}/*{1}_*_2*".format(prefix, sample)):
-                newpath = "{0}/ncovIllumina_sequenceConcatination/{1}_2.fastq.gz".format(
-                    self.indir, base_sample
-                )
+            for item in glob.glob("{0}/{1}*.csq.vcf".format(prefix, base_sample)):
+                newpath = "{0}/{1}.vcf".format(prefix, base_sample)
                 os.symlink(item, newpath)
 
             # rename core
@@ -258,9 +221,7 @@ class DeliverSC2:
                 {
                     "format": "fastq",
                     "id": sampleID,
-                    "path": "{0}/ncovIllumina_sequenceConcatination/{1}_1.fastq.gz".format(
-                        self.indir, base_sample
-                    ),
+                    "path": "{0}/{1}_1.fastq.gz".format(self.fastq_dir, base_sample),
                     "path_index": "~",
                     "step": "concatination",
                     "tag": "forward-reads",
@@ -271,9 +232,7 @@ class DeliverSC2:
                 {
                     "format": "fastq",
                     "id": sampleID,
-                    "path": "{0}/ncovIllumina_sequenceConcatination/{1}_2.fastq.gz".format(
-                        self.indir, base_sample
-                    ),
+                    "path": "{0}/{1}_2.fastq.gz".format(self.fastq_dir, base_sample),
                     "path_index": "~",
                     "step": "concatination",
                     "tag": "reverse-reads",
