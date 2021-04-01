@@ -50,8 +50,7 @@ def get_results(indir, voc_strain, voc_pos, voc_pos_aa):
         content = csv.reader(f)
         next(content)
         for line in content:
-            sample = line[0].split("_")[2]
-            #sample = line[0]        ####TEMPSTUFF
+            sample = line[0].split("_")[-1]
             if float(line[2]) > 95:
                 passed = "TRUE"
             else:
@@ -63,8 +62,7 @@ def get_results(indir, voc_strain, voc_pos, voc_pos_aa):
         content = csv.reader(f)
         next(content)
         for line in content:
-            sample = line[0].split("_")[3].split(".")[0]
-            #sample = line[0].split("_")[1].split(".")[0]        ####TEMPSTUFF
+            sample = line[0].split(".")[0].split("_")[-1]
             lineage = line[1]
             if lineage in voc_strain:
                 voc = "Yes"
