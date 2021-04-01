@@ -1,0 +1,14 @@
+---
+name: Standard issue
+about: Literally a typical issue
+title: ''
+labels: Effort S, Enhancement, Gain S
+assignees: sylvinite
+
+---
+
+**What needs to be done:**
+
+**What are the arguments for getting it done:**
+
+**Task is considered finished when:**
