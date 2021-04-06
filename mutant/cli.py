@@ -220,3 +220,15 @@ def concatenate(ctx, input_folder, app_tag):
     log.debug("Command ran: {}".format(cmd))
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
+
+@toolbox.command()
+@click.pass_context
+def sarscov2images(ctx):
+    """ Builds the sarscov2 pipeline images """
+    bdir = os.getcwd()
+    os.chdir("{0}/externals/gms-artic".format(WD))
+    cmd = "bash scripts/build_singularity_containers.sh"
+    log.debug("Command ran: {}".format(cmd))
+    proc = subprocess.Popen(cmd.split())
+    out, err = proc.communicate()
+    os.chdir(bdir)
