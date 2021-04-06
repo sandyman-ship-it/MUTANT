@@ -12,7 +12,7 @@ import sys
 import yaml
 
 from datetime import date
-from mutant.modules import get_sarscov2_config 
+from mutant.modules.parse import get_sarscov2_config 
 
 class DeliverSC2:
     def __init__(self, caseinfo, resdir, config_artic, fastq_dir, timestamp):
