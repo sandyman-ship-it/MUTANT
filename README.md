@@ -13,7 +13,7 @@ Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
 Add the MUTANT directory to your path. Execute using:
 
 * `source activate D_mutant`
-* `mutant analyse sarscov2 tests/testdata/fasta_files --profiles local,singularity --config_artic mutant/config/local/artic.json` 
+* `mutant analyse sarscov2 tests/testdata/fasta_files --profiles local,singularity --config_artic mutant/config/local/artic.json --config_mutant mutant/config/local/mutant.json` 
 * `Wait 3m. Check results in ./results/` 
 
 ## Version bumping

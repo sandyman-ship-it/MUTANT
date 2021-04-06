@@ -4,7 +4,7 @@
     "_comment": "Folders",
     "folders": {
       "_comment": "Root folder for ALL output",
-      "results": "~/mutant/cases"
+      "results": "results"
     }
   }
 }

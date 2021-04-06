@@ -22,7 +22,7 @@ def get_sarscov2_config(config):
     """Parse SARS-CoV-2 sample config"""
     caseinfo = get_json(config)
     for i in range(len(caseinfo)):
-        caseinfo[i]["region_code"] = caseinfo[i]["region_code"].split()[0]
-        caseinfo[i]["lab_code"] = caseinfo[i]["lab_code"].split()[0]
+        caseinfo[i]["region_code"] = caseinfo[i]["region_code"].replace(" ","_")
+        caseinfo[i]["lab_code"] = caseinfo[i]["lab_code"].replace(" ","_")
         caseinfo[i]["selection_criteria"] = caseinfo[i]["selection_criteria"].split(".")[1].strip()
     return caseinfo
