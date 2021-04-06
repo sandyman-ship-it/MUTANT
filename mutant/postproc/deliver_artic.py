@@ -3,38 +3,21 @@
 
 By: Isak Sylvin & Tanja Normark
 """
-import sys
-from datetime import date
-
+import click
 import csv
 import glob
-import os
 import json
-
-import click
+import os
+import sys
 import yaml
 
-
-def get_json_data(config):
-    if os.path.exists(config):
-        """Get sample information as json object"""
-        try:
-            with open(config) as json_file:
-                data = json.load(json_file)
-        except Exception as e:
-            click.echo("Unable to read provided json file: {}. Exiting..".format(config))
-            click.echo(e)
-            sys.exit(-1)
-    else:
-        click.echo("Could not find supplied config: {}. Exiting..".format(config))
-        sys.exit(-1)
-    return data
-
+from datetime import date
+from mutant.modules import get_sarscov2_config 
 
 class DeliverSC2:
     def __init__(self, caseinfo, resdir, config_artic, fastq_dir, timestamp):
         self.casefile = caseinfo
-        caseinfo = get_json_data(caseinfo)
+        caseinfo = get_sarscov2_config(caseinfo)
 
         regionlab_list = []
         for record in caseinfo:
@@ -58,8 +41,8 @@ class DeliverSC2:
 
         for sampleinfo in self.caseinfo:
             sample = sampleinfo["CG_ID_sample"]
-            region = sampleinfo["region_code"].replace(" ", "_")
-            lab = sampleinfo["lab_code"].replace(" ", "_")
+            region = sampleinfo["region_code"]
+            lab = sampleinfo["lab_code"]
             base_sample = "{0}_{1}_{2}".format(region, lab, sampleinfo["Customer_ID_sample"])
             if not sampleinfo["sequencing_qc_pass"]:
                 continue
@@ -179,7 +162,7 @@ class DeliverSC2:
         # Region-lab-wide
 
         for regionlab in self.regionlabs:
-            rl = regionlab.replace(" ", "_")
+            rl = regionlab
             # Pangolin reports
             deliv["files"].append(
                 {
@@ -211,8 +194,8 @@ class DeliverSC2:
         for record in self.caseinfo:
             sampleID = record["CG_ID_sample"]
             sample = record["Customer_ID_sample"]
-            region = record["region_code"].replace(" ", "_")
-            lab = record["lab_code"].replace(" ", "_")
+            region = record["region_code"]
+            lab = record["lab_code"]
             base_sample = "{0}_{1}_{2}".format(region, lab, sample)
             if not record["sequencing_qc_pass"]:
                 continue
@@ -301,15 +284,15 @@ class DeliverSC2:
         for regionlab in self.regionlabs:
             sumfile = os.path.join(
                 self.indir,
-                "{}_{}_komplettering.csv".format(regionlab.replace(" ", "_"), self.today),
+                "{}_{}_komplettering.csv".format(regionlab, self.today),
             )
             with open(sumfile, "w") as summary:
                 summary.write("provnummer,urvalskriterium,GISAID_accession\n")
 
         # Write sample information to corresponding summary file
         for record in self.caseinfo:
-            region = record["region_code"].replace(" ", "_")
-            lab = record["lab_code"].replace(" ", "_")
+            region = record["region_code"]
+            lab = record["lab_code"]
             sumfile = os.path.join(
                 self.indir, "{}_{}_{}_komplettering.csv".format(region, lab, self.today)
             )
@@ -318,6 +301,6 @@ class DeliverSC2:
                 summary.writerow(
                     [
                         record["Customer_ID_sample"],
-                        record["selection_criteria"].split(".")[1].strip(),
+                        record["selection_criteria"],
                     ]
                 )
