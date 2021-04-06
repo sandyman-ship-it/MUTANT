@@ -7,7 +7,7 @@ import click
 import json
 import subprocess
 from mutant import version, log
-from mutant.assets.utils.parse import get_json
+from mutant.modules.parse import get_json
 
 class RunSC2:
 
@@ -46,7 +46,7 @@ class RunSC2:
         if self.config_artic != "":
             confline = "-C {0}".format(self.config_artic)
 
-        cmd = 'nextflow {0} -log {1} run {2} {3}/externals/gms-artic/main.nf -profile {4} --illumina --prefix {5} ' \
+        cmd = 'nextflow {0} -log {1} run {2} {3}/externals/ncov2019-artic-nf/main.nf -profile {4} --illumina --prefix {5} ' \
               '--directory {6} {7}'.format(confline, nflog, workline, self.WD, self.profiles, self.prefix, self.fastq, resultsline)
         log.debug("Command ran: {}".format(cmd))
         proc = subprocess.Popen(cmd.split())

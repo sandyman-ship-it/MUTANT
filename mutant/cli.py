@@ -12,9 +12,9 @@ import click
 import subprocess
 from datetime import datetime
 from mutant import version, log
-from mutant.assets.deliver.deliver_artic import DeliverSC2
-from mutant.assets.run.run_artic import RunSC2
-from mutant.assets.utils.parse import get_sarscov2_config
+from mutant.postproc.deliver_artic import DeliverSC2
+from mutant.analysis.run_artic import RunSC2
+from mutant.modules.parse import get_sarscov2_config
 
 # File work directory
 WD = os.path.dirname(os.path.realpath(__file__))
@@ -220,7 +220,7 @@ def fohmfile(ctx, input_folder, config_artic, config_case):
 @click.argument("ticket_number")
 def ArticReport(input_folder, ticket_number):
     """Report for QC output of the ARTIC pipeline"""
-    cmd = "python {0}/assets/artic_report.py {1} {2}".format(WD, input_folder, ticket_number)
+    cmd = "python {0}/standalone/artic_report.py {1} {2}".format(WD, input_folder, ticket_number)
     log.debug("Command ran: {}".format(cmd))
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
@@ -231,7 +231,7 @@ def ArticReport(input_folder, ticket_number):
 @click.pass_context
 def concatenate(input_folder, app_tag):
     """ Concatenates fastq files if needed """
-    cmd = "python {0}/assets/concatenate.py {1} {2}".format(WD, input_folder, app_tag)
+    cmd = "python {0}/standalone/concatenate.py {1} {2}".format(WD, input_folder, app_tag)
     log.debug("Command ran: {}".format(cmd))
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
