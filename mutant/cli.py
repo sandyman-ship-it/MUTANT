@@ -202,7 +202,8 @@ def fohmfile(ctx, input_folder, config_artic, config_case):
 @toolbox.command()
 @click.argument("input_folder")
 @click.argument("ticket_number")
-def ArticReport(input_folder, ticket_number):
+@click.pass_context
+def ArticReport(ctx, input_folder, ticket_number):
     """Report for QC output of the ARTIC pipeline"""
     cmd = "python {0}/standalone/artic_report.py {1} {2}".format(WD, input_folder, ticket_number)
     log.debug("Command ran: {}".format(cmd))
@@ -213,7 +214,7 @@ def ArticReport(input_folder, ticket_number):
 @click.argument("input_folder")
 @click.argument("app_tag")
 @click.pass_context
-def concatenate(input_folder, app_tag):
+def concatenate(ctx, input_folder, app_tag):
     """ Concatenates fastq files if needed """
     cmd = "python {0}/standalone/concatenate.py {1} {2}".format(WD, input_folder, app_tag)
     log.debug("Command ran: {}".format(cmd))
