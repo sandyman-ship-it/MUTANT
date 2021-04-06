@@ -1,28 +1,37 @@
 # MUTANT
 Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
 
-## Prereq
-* `Install java 8 or above`
-* `Install singularity (conda install -c conda-forge singularity`
+## Installation
 
-## Setup
+### Prereq
+* Install Java 8 or above (`java --version`)
+* Install singularity (`conda install -c conda-forge singularity`)
+* Install nextflow (`curl -s https://get.nextflow.io | bash`)
+* Path nextflow (`export PATH=$PATH:/MY/WORKING/DIR)
+
+### Setup
 * `git clone --recurse-submodules --branch main https://github.com/Clinical-Genomics/MUTANT.git`
 * `cd MUTANT && source setup.sh D_mutant` 
+* `source activate D_mutant`
+* `mutant toolbox sarscov2images`
 
-## Self-test
-Add the MUTANT directory to your path. Execute using:
+## Development
 
+### Self-test
 * `source activate D_mutant`
 * `mutant analyse sarscov2 tests/testdata/fasta_files --profiles local,singularity --config_artic mutant/config/local/artic.json --config_mutant mutant/config/local/mutant.json` 
-* `Wait 3m. Check results in ./results/` 
+* Wait for pipeline completion (~3m). Check results in `./results/` 
 
-## Version bumping
+### Version bumping
 
 MUTANTs versioning is bumped manually post PR merge, using [semver](https://semver.org/) standards on [this](https://github.com/Clinical-Genomics/MUTANT/blob/main/mutant/__init__.py#L3) variable.
 
-## Deployment
+## Updating
 
-* `cd /home/proj/INSTANCE/mutant/MUTANT`
+* `INSTANCE='stage'` or `INSTANCE='production'`
+* `cd /home/proj/${INSTANCE}/mutant/MUTANT`
 * `git pull origin main`
-* `source activate INSTANCEPREFIX_mutant`
-* `pip install .`
+* `INITIAL="$(echo $word | head -c 1)"`
+* `source activate ${INITIAL}_mutant`
+* `pip install -e .`
+

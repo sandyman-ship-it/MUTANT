@@ -114,7 +114,7 @@ profiles {
         if ( params.medaka || params.nanopolish ){
             process.container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
         } else if (params.illumina) {
-            process.container = "talnor/ncov2019-artic-nf-illumina:1.0"
+            process.container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
         }
         // Temporary directories
         if (params.cache){
