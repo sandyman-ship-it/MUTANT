@@ -88,7 +88,7 @@ def parse_artic_csv(indir, voc_strain, voc_pos, voc_pos_aa):
             content = csv.reader(f)
             next(content)
             for line in content:
-                sample = line[0].split("_")[2]
+                sample = line[0].split("_")[-1]
                 variant = line[2]
                 pos = int(re.findall(r'\d+', variant)[0])
                 if (pos in voc_pos) or (variant in voc_pos_aa):
