@@ -5,7 +5,7 @@
 - `cd MUTANT`
 - `export PATH=$PATH:MUTANT_DIR`
 - `source activate CONDA_ENV`
-- `pip install .`
+- `pip install -e .`
 
 ### How to test:
 - `mutant analyse sarscov2 tests/testdata/fasta_files --profiles local,singularity --config_artic mutant/config/local/artic.json --config_mutant mutant/config/local/mutant.json`
