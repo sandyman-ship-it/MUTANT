@@ -32,9 +32,9 @@ def append_dict(dictionary, key, item):
         dictionary[key] = [item]
     return dictionary
 
-def get_results(indir, voc_strain, voc_pos, voc_pos_aa):
+def parse_artic_csv(indir, voc_strain, voc_pos, voc_pos_aa):
 
-    """ Parse output directory for analysis results. Return dictionary data object """
+    """ Parse artic output directory for analysis results. Returns dictionary data object """
 
     artic_data = dict()
     var_all = dict()
@@ -105,7 +105,7 @@ def get_results(indir, voc_strain, voc_pos, voc_pos_aa):
                 artic_data[sample].update({"variants": "-"})
     return artic_data
 
-def write_summary_report(results, ticket, today):
+def write_results_report(results, ticket, today):
 
     """Write summary csv report of Artic and Pangolin results"""
 
@@ -120,7 +120,7 @@ def write_summary_report(results, ticket, today):
                             data["lineage"], data["pangoLEARN_version"], data["VOC"], data["VOC_aa"]]
             summary.writerow(row)
 
-def write_variant_report(indir, ticket, today):
+def write_variant_summary_report(indir, ticket, today):
 
     """Write variant csv report of identified variants"""
 
@@ -140,13 +140,15 @@ def write_variant_report(indir, ticket, today):
         except Exception as e:
             print('Failed creating file {}\n{}'.format(varout, e))
 
-def json_dump(data, jsonfile):
+def write_json_report(data, jsonfile):
+
+    """ Output all result data in a json format for easy parsing """
 
     with open(jsonfile, "w") as outfile:
         json.dump(data, outfile)
 
 # Create result summaries
-results = get_results(indir, voc_strain, voc_pos, voc_pos_aa)
-write_summary_report(results, ticket, today)
-write_variant_report(indir, ticket, today)
-json_dump(results, "{}_{}.json".format(ticket, today))
+artic_dict = parse_artic_csv(indir, voc_strain, voc_pos, voc_pos_aa)
+write_results_report(artic_dict, ticket, today)
+write_variant_summary_report(indir, ticket, today)
+write_json_report(results, "{}_{}.json".format(ticket, today))
