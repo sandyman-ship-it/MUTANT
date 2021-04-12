@@ -32,21 +32,31 @@ def append_dict(dictionary, key, item):
         dictionary[key] = [item]
     return dictionary
 
-def get_results(indir, voc_strain, voc_pos, voc_pos_aa):
+def parse_artic_csv(indir, voc_strain, voc_pos, voc_pos_aa):
 
-    """ Parse output directory for analysis results. Return dictionary data object """
+    """ Parse artic output directory for analysis results. Returns dictionary data object """
 
     artic_data = dict()
     var_all = dict()
     var_voc = dict()
 
-    # Get result files
-    qcRep = glob.glob(os.path.join(indir, "*qc.csv"))[0]
-    varRep = glob.glob(os.path.join(indir, "*variant_summary.csv"))[0]
-    pangolinRep = glob.glob(os.path.join(indir, "ncovIllumina_sequenceAnalysis_makeConsensus/*pangolin.csv"))[0]
+    # Files of interest. ONLY ADD TO END OF THIS LIST
+    files = ["*qc.csv","*variant_summary.csv","ncovIllumina_sequenceAnalysis_makeConsensus/*pangolin.csv"]
+    paths = list()
+    for f in files:
+        try:
+            hits = glob.glob(os.path.join(indir, f))
+            if len(hits) == 0:
+                raise Exception("File not found")
+            if len(hits) > 1:
+                print("Multiple hits for {0}/{1}, picking {2}".format(indir, f, hits[0]))
+            paths.append(hits[0])
+        except Exception as e:
+            print("Unable to find {0} in {1} ({2})".format(f, indir, e))
+            sys.exit(-1)
 
     # Parse qc report data
-    with open(qcRep) as f:
+    with open(paths[0]) as f:
         content = csv.reader(f)
         next(content)
         for line in content:
@@ -58,7 +68,7 @@ def get_results(indir, voc_strain, voc_pos, voc_pos_aa):
             artic_data[sample] = {"pct_n_bases": line[1], "pct_10X_bases": line[2], "longest_no_N_run": line[3],
                                   "num_aligned_reads": line[4], "artic_qc": line[7], "qc": passed}
     # Parse Pangolin report data
-    with open(pangolinRep) as f:
+    with open(paths[2]) as f:
         content = csv.reader(f)
         next(content)
         for line in content:
@@ -73,12 +83,12 @@ def get_results(indir, voc_strain, voc_pos, voc_pos_aa):
             artic_data[sample].update({"lineage": lineage, "pangolin_probability": line[2],
                                        "pangoLEARN_version": line[3], "pangolin_qc": line[4], "VOC": voc})
     # Parse Variant report data
-    if os.stat(varRep).st_size != 0:
-        with open(varRep) as f:
+    if os.stat(paths[1]).st_size != 0:
+        with open(paths[1]) as f:
             content = csv.reader(f)
             next(content)
             for line in content:
-                sample = line[0].split("_")[2]
+                sample = line[0].split("_")[-1]
                 variant = line[2]
                 pos = int(re.findall(r'\d+', variant)[0])
                 if (pos in voc_pos) or (variant in voc_pos_aa):
@@ -105,7 +115,7 @@ def get_results(indir, voc_strain, voc_pos, voc_pos_aa):
                 artic_data[sample].update({"variants": "-"})
     return artic_data
 
-def write_summary_report(results, ticket, today):
+def write_results_report(results, ticket, today):
 
     """Write summary csv report of Artic and Pangolin results"""
 
@@ -120,9 +130,10 @@ def write_summary_report(results, ticket, today):
                             data["lineage"], data["pangoLEARN_version"], data["VOC"], data["VOC_aa"]]
             summary.writerow(row)
 
-def write_variant_report(indir, ticket, today):
+def write_variant_summary_report(indir, ticket, today):
 
-    """Write variant csv report of identified variants"""
+    """Write variant csv report of identified variants
+       I am literally just variant_summary.csv but with sample names"""
 
     varRep = glob.glob(os.path.join(indir, "*variant_summary.csv"))[0]
     varout = os.path.join(indir, "sars-cov-2_{}_variants_{}.csv".format(ticket, today))
@@ -133,20 +144,22 @@ def write_variant_report(indir, ticket, today):
             varsummary.writerow(variants[0].strip().split(","))
             for line in variants[1:]:
                 line = line.strip().split(",")
-                varsummary.writerow([line[0].split("_")[2]] + line[1:])
+                varsummary.writerow([line[0].split("_")[-1]] + line[1:])
     else:
         try:
             open(varout, 'a').close()
         except Exception as e:
             print('Failed creating file {}\n{}'.format(varout, e))
 
-def json_dump(data, jsonfile):
+def write_json_report(data, jsonfile):
+
+    """ Output all result data in a json format for easy parsing """
 
     with open(jsonfile, "w") as outfile:
         json.dump(data, outfile)
 
 # Create result summaries
-results = get_results(indir, voc_strain, voc_pos, voc_pos_aa)
-write_summary_report(results, ticket, today)
-write_variant_report(indir, ticket, today)
-json_dump(results, "{}_{}.json".format(ticket, today))
+artic_dict = parse_artic_csv(indir, voc_strain, voc_pos, voc_pos_aa)
+write_results_report(artic_dict, ticket, today)
+write_variant_summary_report(indir, ticket, today)
+write_json_report(artic_dict, "{}_{}.json".format(ticket, today))
