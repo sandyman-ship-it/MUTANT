@@ -1,6 +1,6 @@
 import logging
 
-version = '3.4.0'
+version = '3.4.1'
 
 # Initialize log
 log = logging.getLogger("main_log")
