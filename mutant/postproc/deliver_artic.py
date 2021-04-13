@@ -37,7 +37,7 @@ class DeliverSC2:
         self.fastq_dir = fastq_dir
 
     def get_finished_slurm_ids(self) -> list:
-        trace_file_path = Path(self.resdir, "pipeline_info", "execution_trace.txt")
+        trace_file_path = Path(self.indir, "pipeline_info", "execution_trace.txt")
         slurm_id_list = []
         with open(trace_file_path, "r") as trace_file_contents:
             for line in trace_file_contents:
@@ -49,7 +49,7 @@ class DeliverSC2:
         return slurm_id_list
 
     def create_trailblazer_config(self) -> None:
-        trailblazer_config_path = Path(self.resdir, "trailblazer_config.yaml")
+        trailblazer_config_path = Path(self.indir, "trailblazer_config.yaml")
         finished_slurm_ids = self.get_finished_slurm_ids()
         if not finished_slurm_ids:
             return
