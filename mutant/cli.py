@@ -81,10 +81,10 @@ def sarscov2(ctx, input_folder, config_artic, config_case, config_mutant, outdir
             config_artic=config_artic,
             timestamp=TIMESTAMP,
         )
-        delivery.create_trailblazer_config()
+        delivery.create_fohm_csv()
         delivery.rename_deliverables()
         delivery.create_deliveryfile()
-        delivery.create_fohm_csv()
+        delivery.create_trailblazer_config()
 
 
 @analyse.command()
