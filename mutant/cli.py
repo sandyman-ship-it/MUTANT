@@ -1,20 +1,18 @@
 """ CLI access point for various MICROBIAL tools 
     By: Isak Sylvin @sylvinite & C:/O """
 
-
-#!/usr/bin/env python
+# !/usr/bin/env python
 
 import os
-import sys
-import re
-import json
-import click
 import subprocess
 from datetime import datetime
+
+import click
+
 from mutant import version, log
-from mutant.postproc.deliver_artic import DeliverSC2
 from mutant.analysis.run_artic import RunSC2
-from mutant.modules.parse import get_sarscov2_config, get_json
+from mutant.modules.parse import get_json
+from mutant.postproc.deliver_artic import DeliverSC2
 
 # File work directory
 WD = os.path.dirname(os.path.realpath(__file__))
@@ -43,7 +41,11 @@ def analyse(ctx):
     default="{}/config/hasta/artic.json".format(WD),
 )
 @click.option("--config_case", help="Provided config for the case", default="")
-@click.option("--config_mutant", help="General configuration file for MUTANT", default="{}/config/hasta/mutant.json".format(WD))
+@click.option(
+    "--config_mutant",
+    help="General configuration file for MUTANT",
+    default="{}/config/hasta/mutant.json".format(WD),
+)
 @click.option("--outdir", help="Output folder to override general configutations", default="")
 @click.option("--profiles", help="Execution profiles, comma-separated", default="singularity,slurm")
 @click.pass_context
@@ -79,6 +81,7 @@ def sarscov2(ctx, input_folder, config_artic, config_case, config_mutant, outdir
             config_artic=config_artic,
             timestamp=TIMESTAMP,
         )
+        delivery.create_trailblazer_config()
         delivery.rename_deliverables()
         delivery.create_deliveryfile()
         delivery.create_fohm_csv()
@@ -210,6 +213,7 @@ def ArticReport(ctx, input_folder, ticket_number):
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
 
+
 @toolbox.command()
 @click.argument("input_folder")
 @click.argument("app_tag")
@@ -220,6 +224,7 @@ def concatenate(ctx, input_folder, app_tag):
     log.debug("Command ran: {}".format(cmd))
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
+
 
 @toolbox.command()
 @click.pass_context

@@ -3,16 +3,16 @@
 
 By: Isak Sylvin & Tanja Normark
 """
-import click
 import csv
 import glob
-import json
 import os
-import sys
+from datetime import date
+from pathlib import Path
+
 import yaml
 
-from datetime import date
-from mutant.modules.parse import get_sarscov2_config 
+from mutant.modules.parse import get_sarscov2_config
+
 
 class DeliverSC2:
     def __init__(self, caseinfo, resdir, config_artic, fastq_dir, timestamp):
@@ -35,6 +35,26 @@ class DeliverSC2:
         today = date.today().strftime("%Y%m%d")
         self.today = today
         self.fastq_dir = fastq_dir
+
+    def get_finished_slurm_ids(self) -> list:
+        trace_file_path = Path(self.resdir, "pipeline_info", "execution_trace.txt")
+        slurm_id_list = []
+        with open(trace_file_path, "r") as trace_file_contents:
+            for line in trace_file_contents:
+                slurm_id = line.split()[2]
+                try:
+                    slurm_id_list.append(int(slurm_id))
+                except Exception:
+                    continue
+        return slurm_id_list
+
+    def create_trailblazer_config(self) -> None:
+        trailblazer_config_path = Path(self.resdir, "trailblazer_config.yaml")
+        finished_slurm_ids = self.get_finished_slurm_ids()
+        if not finished_slurm_ids:
+            return
+        with open(trailblazer_config_path, "w") as trailblazer_config_file:
+            yaml.dump(data={"jobs": finished_slurm_ids}, stream=trailblazer_config_file)
 
     def rename_deliverables(self):
         """Rename result files for delivery: fastq, consensus files, vcf and pangolin"""
