@@ -69,13 +69,13 @@ class DeliverSC2:
 
             # rename makeConsensus
             prefix = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(self.indir)
-            for item in glob.glob("{0}/{1}*".format(prefix, base_sample)):
+            for item in glob.glob("{0}/{1}.*".format(prefix, base_sample)):
                 newpath = "{0}/{1}.consensus.fasta".format(prefix, base_sample)
                 os.symlink(item, newpath)
 
             # rename typeVariants
             prefix = "{0}/ncovIllumina_Genotyping_typeVariants/vcf".format(self.indir)
-            for item in glob.glob("{0}/{1}*.csq.vcf".format(prefix, base_sample)):
+            for item in glob.glob("{0}/{1}.csq.vcf".format(prefix, base_sample)):
                 newpath = "{0}/{1}.vcf".format(prefix, base_sample)
                 os.symlink(item, newpath)
 
