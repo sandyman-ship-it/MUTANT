@@ -38,6 +38,7 @@ MUTANTs versioning is bumped manually post PR merge, using [semver](https://semv
 
 * `INSTANCE='stage'` or `INSTANCE='production'`
 * `cd /home/proj/${INSTANCE}/mutant/MUTANT`
+* `git checkout main`
 * `git pull origin main`
 * `INITIAL="$(echo $word | head -c 1)"`
 * `source activate ${INITIAL}_mutant`
