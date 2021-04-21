@@ -35,10 +35,16 @@ if len(sys.argv) == 3:
         sys.exit(-1)
 
 for dir_name in os.listdir(base_path):
+    dir_path = os.path.join(base_path, dir_name)
+    if len(os.listdir(dir_path)) == 0:
+        print("Empty folder found: %s" % (dir_path))
+        cmd = "rmdir " + str(dir_path)
+        os.system(cmd)
+        print("Running command: %s" % (cmd))
+        continue
+    if not os.path.isdir(dir_path):
+        continue
     for read_direction in [1, 2]:
-        dir_path = os.path.join(base_path, dir_name)
-        if not os.path.isdir(dir_path):
-            continue
         same_direction = []
         total_size = 0
         for file in os.listdir(dir_path):
