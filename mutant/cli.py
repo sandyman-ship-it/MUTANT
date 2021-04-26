@@ -172,7 +172,7 @@ def rename(ctx, input_folder, config_artic, config_case):
 @click.option("--config_case", help="Provided config for the case", required=True)
 @click.pass_context
 def deliveryfile(ctx, input_folder, config_artic, config_case):
-    """Generates CG specific delivery file"""
+    """CG specific delivery file"""
 
     # Deliverables
     if config_case != "":
@@ -196,7 +196,7 @@ def deliveryfile(ctx, input_folder, config_artic, config_case):
 @click.option("--config_case", help="Provided config for the case", required=True)
 @click.pass_context
 def fohmfile(ctx, input_folder, config_artic, config_case):
-    """Generates FoHM demanded delivery file"""
+    """FoHM demanded delivery file"""
 
     # Deliverables
     if config_case != "":
@@ -215,7 +215,7 @@ def fohmfile(ctx, input_folder, config_artic, config_case):
 @click.argument("ticket_number")
 @click.pass_context
 def ArticReport(ctx, input_folder, ticket_number):
-    """Report for QC output of the ARTIC pipeline"""
+    """KS Typing Report of the ARTIC pipeline"""
     cmd = "python {0}/standalone/ks_typing_report.py {1} {2}".format(
         WD, input_folder, ticket_number
     )
