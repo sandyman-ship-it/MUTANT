@@ -1,5 +1,6 @@
-""" This script renames the output files for the ARTIC pipeline and Pangolin analysis,
-    and creates a deliverables file for Clinical Genomics Infrastructure
+""" This class modifies files to be fit for delivery. Existing files are renamed,
+    new reports are created. Specifically it acts on the sarscov2 pipeline,
+    and creates deliverables files for Clinical Genomics Infrastructure
 
 By: Isak Sylvin & Tanja Normark
 """
@@ -11,7 +12,7 @@ from pathlib import Path
 
 import yaml
 
-from mutant.modules.parse import get_sarscov2_config
+from mutant.modules.generic_parser import get_sarscov2_config
 
 
 class DeliverSC2:

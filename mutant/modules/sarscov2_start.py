@@ -7,7 +7,7 @@ import click
 import json
 import subprocess
 from mutant import version, log
-from mutant.modules.parse import get_json
+from mutant.modules.generic_parser import get_json
 
 class RunSC2:
 

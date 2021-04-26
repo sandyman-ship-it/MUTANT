@@ -10,9 +10,9 @@ from datetime import datetime
 import click
 
 from mutant import version, log
-from mutant.analysis.run_artic import RunSC2
-from mutant.modules.parse import get_json
-from mutant.postproc.deliver_artic import DeliverSC2
+from mutant.modules.sarscov2_start import RunSC2
+from mutant.modules.generic_parser import get_json
+from mutant.modules.sarscov2_report import DeliverSC2
 
 # File work directory
 WD = os.path.dirname(os.path.realpath(__file__))
@@ -208,7 +208,7 @@ def fohmfile(ctx, input_folder, config_artic, config_case):
 @click.pass_context
 def ArticReport(ctx, input_folder, ticket_number):
     """Report for QC output of the ARTIC pipeline"""
-    cmd = "python {0}/standalone/artic_report.py {1} {2}".format(WD, input_folder, ticket_number)
+    cmd = "python {0}/standalone/ks_typing_report.py {1} {2}".format(WD, input_folder, ticket_number)
     log.debug("Command ran: {}".format(cmd))
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
@@ -232,7 +232,7 @@ def create_images(ctx):
     """ Builds the sarscov2 pipeline images """
     bdir = os.getcwd()
     os.chdir("{0}/externals/gms-artic".format(WD))
-    cmd = "bash scripts/build_singularity_containers.sh"
+    cmd = "bash scripts/build_singularity_containers.sh && chmod 0777 *.sif"
     log.debug("Command ran: {}".format(cmd))
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
