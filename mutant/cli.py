@@ -228,7 +228,7 @@ def concatenate(ctx, input_folder, app_tag):
 
 @toolbox.command()
 @click.pass_context
-def sarscov2images(ctx):
+def create_images(ctx):
     """ Builds the sarscov2 pipeline images """
     bdir = os.getcwd()
     os.chdir("{0}/externals/gms-artic".format(WD))
