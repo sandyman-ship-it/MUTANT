@@ -35,12 +35,5 @@ Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
 MUTANTs versioning is bumped manually post PR merge, using [semver](https://semver.org/) standards on [this](https://github.com/Clinical-Genomics/MUTANT/blob/main/mutant/__init__.py#L3) variable.
 
 ## Deploying new version
-
-* `INSTANCE='stage'` or `INSTANCE='production'`
-* `cd /home/proj/${INSTANCE}/mutant/MUTANT`
-* `git checkout main`
-* `git pull origin main`
-* `INITIAL="$(echo $INSTANCE | head -c 1)"`
-* `source activate ${INITIAL^}_mutant`
-* `pip install -e .`
-
+Determine if instance is either 'production' or stage.
+`bash /home/onyx/tmp/MUTANT/mutant/standalone/deploy_hasta_update.sh <INSTANCE>`
