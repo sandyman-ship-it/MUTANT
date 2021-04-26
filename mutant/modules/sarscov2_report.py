@@ -64,12 +64,16 @@ class DeliverSC2:
             sample = sampleinfo["CG_ID_sample"]
             region = sampleinfo["region_code"]
             lab = sampleinfo["lab_code"]
-            base_sample = "{0}_{1}_{2}".format(region, lab, sampleinfo["Customer_ID_sample"])
+            base_sample = "{0}_{1}_{2}".format(
+                region, lab, sampleinfo["Customer_ID_sample"]
+            )
             if not sampleinfo["sequencing_qc_pass"]:
                 continue
 
             # rename makeConsensus
-            prefix = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(self.indir)
+            prefix = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(
+                self.indir
+            )
             for item in glob.glob("{0}/{1}.*".format(prefix, base_sample)):
                 newpath = "{0}/{1}.consensus.fasta".format(prefix, base_sample)
                 os.symlink(item, newpath)
@@ -190,7 +194,9 @@ class DeliverSC2:
                     "format": "csv",
                     "id": self.case,
                     "path": "{}/ncovIllumina_sequenceAnalysis_makeConsensus/"
-                    "{}_{}_pangolin_classification.txt".format(self.indir, rl, self.today),
+                    "{}_{}_pangolin_classification.txt".format(
+                        self.indir, rl, self.today
+                    ),
                     "path_index": "~",
                     "step": "typing",
                     "tag": "SARS-CoV-2-type",

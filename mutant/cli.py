@@ -23,7 +23,7 @@ TIMESTAMP = datetime.now().strftime("%y%m%d-%H%M%S")
 @click.version_option(version)
 @click.pass_context
 def root(ctx):
-    """ Microbial Utility Toolbox And wrapper for data traNsmission and Transformation """
+    """Microbial Utility Toolbox And wrapper for data traNsmission and Transformation"""
     ctx.obj = {}
 
 
@@ -46,10 +46,18 @@ def analyse(ctx):
     help="General configuration file for MUTANT",
     default="{}/config/hasta/mutant.json".format(WD),
 )
-@click.option("--outdir", help="Output folder to override general configutations", default="")
-@click.option("--profiles", help="Execution profiles, comma-separated", default="singularity,slurm")
+@click.option(
+    "--outdir", help="Output folder to override general configutations", default=""
+)
+@click.option(
+    "--profiles",
+    help="Execution profiles, comma-separated",
+    default="singularity,slurm",
+)
 @click.pass_context
-def sarscov2(ctx, input_folder, config_artic, config_case, config_mutant, outdir, profiles):
+def sarscov2(
+    ctx, input_folder, config_artic, config_case, config_mutant, outdir, profiles
+):
 
     # Set base for output files (Move this section)
     if config_case != "":
@@ -208,7 +216,9 @@ def fohmfile(ctx, input_folder, config_artic, config_case):
 @click.pass_context
 def ArticReport(ctx, input_folder, ticket_number):
     """Report for QC output of the ARTIC pipeline"""
-    cmd = "python {0}/standalone/ks_typing_report.py {1} {2}".format(WD, input_folder, ticket_number)
+    cmd = "python {0}/standalone/ks_typing_report.py {1} {2}".format(
+        WD, input_folder, ticket_number
+    )
     log.debug("Command ran: {}".format(cmd))
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
@@ -219,8 +229,10 @@ def ArticReport(ctx, input_folder, ticket_number):
 @click.argument("app_tag")
 @click.pass_context
 def concatenate(ctx, input_folder, app_tag):
-    """ Concatenates fastq files if needed """
-    cmd = "python {0}/standalone/concatenate.py {1} {2}".format(WD, input_folder, app_tag)
+    """Concatenates fastq files if needed"""
+    cmd = "python {0}/standalone/concatenate.py {1} {2}".format(
+        WD, input_folder, app_tag
+    )
     log.debug("Command ran: {}".format(cmd))
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
@@ -229,7 +241,7 @@ def concatenate(ctx, input_folder, app_tag):
 @toolbox.command()
 @click.pass_context
 def create_images(ctx):
-    """ Builds the sarscov2 pipeline images """
+    """Builds the sarscov2 pipeline images"""
     bdir = os.getcwd()
     os.chdir("{0}/externals/gms-artic".format(WD))
     cmd = "bash scripts/build_singularity_containers.sh && chmod 0777 *.sif"

@@ -14,7 +14,9 @@ from pathlib import Path
 
 
 if len(sys.argv) > 3 or len(sys.argv) < 2:
-    print("Usage: concatenate.py <input_folder> <app_tag> OR concatenate.py <input_folder>")
+    print(
+        "Usage: concatenate.py <input_folder> <app_tag> OR concatenate.py <input_folder>"
+    )
     sys.exit(-1)
 
 base_path = sys.argv[1]
@@ -27,11 +29,17 @@ if len(sys.argv) == 3:
 
     for prefix in PREFIX_TO_CONCATENATE:
         if app_tag.startswith(prefix):
-            print("Apptag %s identified, data generated with this application tag should be concatenated" % (app_tag))
+            print(
+                "Apptag %s identified, data generated with this application tag should be concatenated"
+                % (app_tag)
+            )
             should_concatenate = True
 
     if should_concatenate == False:
-        print("Data with application tag %s should not be concatenated, skipping concatenation" % (app_tag))
+        print(
+            "Data with application tag %s should not be concatenated, skipping concatenation"
+            % (app_tag)
+        )
         sys.exit(-1)
 
 for dir_name in os.listdir(base_path):
@@ -60,13 +68,24 @@ for dir_name in os.listdir(base_path):
             cmd = cmd + " " + same_direction[i]
         today = date.today()
         today_formatted = today.strftime("%y%m%d")
-        output = dir_path + "/" + today_formatted + "_" + dir_name + "_" + str(read_direction) + ".fastq.gz"
+        output = (
+            dir_path
+            + "/"
+            + today_formatted
+            + "_"
+            + dir_name
+            + "_"
+            + str(read_direction)
+            + ".fastq.gz"
+        )
         cmd = cmd + " > " + output
         print("Running command: %s" % (cmd))
         os.system(cmd)
         concatenated_size = Path(output).stat().st_size
         if total_size == concatenated_size:
-            print("QC PASSED: Total size for files used in concatenation match the size of the concatenated file")
+            print(
+                "QC PASSED: Total size for files used in concatenation match the size of the concatenated file"
+            )
             for file in same_direction:
                 inode_check_cmd = "stat -c %h " + file
                 n_inodes = subprocess.getoutput(inode_check_cmd)
@@ -74,6 +93,8 @@ for dir_name in os.listdir(base_path):
                     print("Removing file: %s" % (file))
                     os.remove(file)
                 else:
-                    print("WARNING %s only got 1 inode, file will not be removed" % (file))
+                    print(
+                        "WARNING %s only got 1 inode, file will not be removed" % (file)
+                    )
         else:
             print("WARNING data lost in concatenation")
