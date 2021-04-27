@@ -41,6 +41,7 @@ class ReportSC2:
     def create_all_files(self):
         self.create_trailblazer_config()
         self.create_concat_pangolin()
+        self.create_concat_consensus()
         self.create_deliveryfile()
         self.create_fohm_csv()
 
@@ -72,6 +73,19 @@ class ReportSC2:
         concat = open("{0}/{1}.pangolin.csv".format(self.indir, self.ticket), "w+")
 
         for item in glob.glob("{0}/*.csv".format(indir)):
+                single = open(item, "r")
+                concat.write(single.read())
+                concat.write("\n")
+        concat.close()
+
+
+    def create_concat_consensus(self):
+
+        indir = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(self.indir)
+
+        concat = open("{0}/{1}.consensus.fa".format(self.indir, self.ticket), "w+")
+
+        for item in glob.glob("{0}/*.consensus.fa".format(indir)):
                 single = open(item, "r")
                 concat.write(single.read())
                 concat.write("\n")
