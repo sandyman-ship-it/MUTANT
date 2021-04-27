@@ -38,7 +38,6 @@ class ReportSC2:
         self.fastq_dir = fastq_dir
         self.articdata = dict()
 
-
     def create_all_files(self):
         self.create_trailblazer_config()
         self.create_concat_pangolin()
@@ -48,7 +47,6 @@ class ReportSC2:
         self.create_sarscov2_resultfile()
         self.create_sarscov2_variantfile()
         self.create_jsonfile()
-
 
     def get_finished_slurm_ids(self) -> list:
         trace_file_path = Path(self.indir, "pipeline_info", "execution_trace.txt")
@@ -77,11 +75,10 @@ class ReportSC2:
         concat = open("{0}/{1}.pangolin.csv".format(self.indir, self.ticket), "w+")
 
         for item in glob.glob("{0}/*.csv".format(indir)):
-                single = open(item, "r")
-                concat.write(single.read())
-                concat.write("\n")
+            single = open(item, "r")
+            concat.write(single.read())
+            concat.write("\n")
         concat.close()
-
 
     def create_concat_consensus(self):
 
@@ -90,9 +87,9 @@ class ReportSC2:
         concat = open("{0}/{1}.consensus.fa".format(self.indir, self.ticket), "w+")
 
         for item in glob.glob("{0}/*.consensus.fa".format(indir)):
-                single = open(item, "r")
-                concat.write(single.read())
-                concat.write("\n")
+            single = open(item, "r")
+            concat.write(single.read())
+            concat.write("\n")
         concat.close()
 
     def create_fohm_csv(self):
@@ -124,13 +121,12 @@ class ReportSC2:
                     ]
                 )
 
-    def create_sarscov2_resultfile():
+    def create_sarscov2_resultfile(self):
         """Write summary csv report of Artic and Pangolin results"""
 
         ticket = self.ticket
         today = self.today
         results = self.articdata
-
 
         summaryfile = os.path.join(
             indir, "sars-cov-2_{}_results_{}.csv".format(ticket, today)
@@ -167,8 +163,7 @@ class ReportSC2:
                 ]
                 summary.writerow(row)
 
-
-    def create_sarscov2_variantfile():
+    def create_sarscov2_variantfile(self):
         """Write variant csv report of identified variants
         I am literally just variant_summary.csv but with sample names"""
 
@@ -177,7 +172,9 @@ class ReportSC2:
         today = self.today
 
         varRep = glob.glob(os.path.join(indir, "*variant_summary.csv"))[0]
-        varout = os.path.join(indir, "sars-cov-2_{}_variants_{}.csv".format(ticket, today))
+        varout = os.path.join(
+            indir, "sars-cov-2_{}_variants_{}.csv".format(ticket, today)
+        )
         if os.stat(varRep).st_size != 0:
             with open(varRep) as f, open(varout, mode="w") as out:
                 variants = f.readlines()
@@ -192,22 +189,23 @@ class ReportSC2:
             except Exception as e:
                 print("Failed creating file {}\n{}".format(varout, e))
 
+    def create_jsonfile(self):
 
-    def create_jsonfile():
-     
         """Output all result data in a json format for easy parsing"""
 
-        with open("{}/{}_{}".format(self.indir, self.ticket, self.today, "w") as outfile:
+        with open(
+            "{}/{}_{}".format(self.indir, self.ticket, self.today), "w"
+        ) as outfile:
             json.dump(self.articdata, outfile)
 
-
-    def parse_artic_csv():
+    def parse_artic_csv(self):
         """Parse artic output directory for analysis results. Returns dictionary data object"""
         indir = self.indir
         voc_pos = range(475, 486)
-        voc_pos_aa=["L452R"]
-        voc_strains = get_json("{0}/voc_strains.json".format(os.path.dirname(os.path.realpath(__file__))))
-
+        voc_pos_aa = ["L452R"]
+        voc_strains = get_json(
+            "{0}/voc_strains.json".format(os.path.dirname(os.path.realpath(__file__)))
+        )
 
         artic_data = dict()
         var_all = dict()
@@ -227,7 +225,9 @@ class ReportSC2:
                     raise Exception("File not found")
                 if len(hits) > 1:
                     print(
-                        "Multiple hits for {0}/{1}, picking {2}".format(indir, f, hits[0])
+                        "Multiple hits for {0}/{1}, picking {2}".format(
+                            indir, f, hits[0]
+                        )
                     )
                 paths.append(hits[0])
             except Exception as e:
@@ -300,7 +300,9 @@ class ReportSC2:
             for sample in artic_data.keys():
                 if sample in var_all.keys():
                     if len(var_all[sample]) > 1:
-                        artic_data[sample].update({"variants": ";".join(var_all[sample])})
+                        artic_data[sample].update(
+                            {"variants": ";".join(var_all[sample])}
+                        )
                     else:
                         artic_data[sample].update({"variants": var_all[sample]})
                 else:
