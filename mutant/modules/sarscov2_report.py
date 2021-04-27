@@ -6,17 +6,18 @@
 
 import csv
 import glob
+import json
 import os
+import yaml 
+
 from datetime import date
 from pathlib import Path
-
-import yaml
 
 from mutant.modules.generic_parser import get_sarscov2_config, get_json
 
 
 class ReportSC2:
-    def __init__(self, caseinfo, resdir, config_artic, fastq_dir, timestamp):
+    def __init__(self, caseinfo, indir, config_artic, fastq_dir, timestamp):
         self.casefile = caseinfo
         caseinfo = get_sarscov2_config(caseinfo)
 
@@ -30,7 +31,7 @@ class ReportSC2:
         self.ticket = caseinfo[0]["Customer_ID_project"]
         self.project = caseinfo[0]["Customer_ID_project"]
         self.regionlabs = regionlab_list
-        self.indir = resdir
+        self.indir = indir
         self.config_artic = config_artic
         self.time = timestamp
         today = date.today().strftime("%Y%m%d")

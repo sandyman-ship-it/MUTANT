@@ -127,9 +127,10 @@ def sarscov2(ctx):
     help="Custom artic configuration file",
     default="{}/config/hasta/artic.json".format(WD),
 )
+@click.option("--fastq_folder", help="Sequence data folder for the case", required=True)
 @click.option("--config_case", help="Provided config for the case", required=True)
 @click.pass_context
-def postproc(ctx, input_folder, config_artic, config_case):
+def postproc(ctx, input_folder, config_artic, fastq_folder, config_case):
     """Applies all cg post-processing of the sarscov2 pipeline"""
 
 
@@ -137,9 +138,9 @@ def postproc(ctx, input_folder, config_artic, config_case):
     if config_case != "":
         report = ReportSC2(
             caseinfo=config_case,
-            resdir=os.path.abspath(resdir),
+            indir=os.path.abspath(input_folder),
             config_artic=config_artic,
-            fastq_dir=os.path.abspath(input_folder),
+            fastq_dir=os.path.abspath(fastq_folder),
             timestamp=TIMESTAMP,
         )
 
@@ -149,7 +150,7 @@ def postproc(ctx, input_folder, config_artic, config_case):
     if config_case != "":
         delivery = DeliverySC2(
             caseinfo=config_case,
-            indir=os.path.abspath(resdir),
+            indir=os.path.abspath(input_folder),
         )
 
         delivery.rename_deliverables()
