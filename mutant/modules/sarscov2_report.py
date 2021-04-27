@@ -1,9 +1,9 @@
-""" This class modifies files to be fit for delivery. Existing files are renamed,
-    new reports are created. Specifically it acts on the sarscov2 pipeline,
-    and creates deliverables files for Clinical Genomics Infrastructure
+""" This class creates reports. Specifically it acts on the sarscov2 pipeline,
+    and creates report files for Clinical Genomics Infrastructure
 
-By: Isak Sylvin & Tanja Normark
+    By: Isak Sylvin & Tanja Normark
 """
+
 import csv
 import glob
 import os

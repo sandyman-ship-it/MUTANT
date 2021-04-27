@@ -1,5 +1,8 @@
-"""
-  By: Isak Sylvin, @sylvinite
+""" This class modifies existing files to fit the Clinical Genomics infrastructure.
+    Specifically it acts on the sarscov2 pipeline.
+
+    By: Isak Sylvin & Tanja Normark
+
 """
 
 
