@@ -90,9 +90,12 @@ def sarscov2(
             timestamp=TIMESTAMP,
         )
         delivery.create_fohm_csv()
+        delivery.create_concat_pangolinfile()
         delivery.rename_deliverables()
         delivery.create_deliveryfile()
         delivery.create_trailblazer_config()
+
+
 
 
 @analyse.command()

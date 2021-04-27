@@ -97,6 +97,19 @@ class DeliverSC2:
                     hit = hit[0]
                     os.symlink(hit, "{0}/{1}{2}".format(self.indir, self.ticket, thing))
 
+    def create_concat_pangolinfile(self):
+
+        indir = "{0}/ncovIllumina_sequenceAnalysis_pangolinTyping".format(self.indir)
+
+        concat = open("{0}/{1}.pangolin.csv".format(self.indir, self.ticket), "w+")
+
+        for item in glob.glob("{0}/*.csv".format(indir):
+                single = open(item, "r")
+                concat.write(single.read())
+                concat.write("\n")
+        concat.close()
+
+
     def create_deliveryfile(self):
 
         """Create deliverables file"""
