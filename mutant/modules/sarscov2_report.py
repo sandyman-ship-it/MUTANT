@@ -12,7 +12,7 @@ from pathlib import Path
 
 import yaml
 
-from mutant.modules.generic_parser import get_sarscov2_config
+from mutant.modules.generic_parser import get_sarscov2_config, get_json
 
 
 class ReportSC2:
@@ -36,6 +36,7 @@ class ReportSC2:
         today = date.today().strftime("%Y%m%d")
         self.today = today
         self.fastq_dir = fastq_dir
+        self.articdata = dict()
 
 
     def create_all_files(self):
@@ -44,6 +45,9 @@ class ReportSC2:
         self.create_concat_consensus()
         self.create_deliveryfile()
         self.create_fohm_csv()
+        self.create_sarscov2_resultfile()
+        self.create_sarscov2_variantfile()
+        self.create_jsonfile()
 
 
     def get_finished_slurm_ids(self) -> list:
@@ -120,6 +124,188 @@ class ReportSC2:
                     ]
                 )
 
+    def create_sarscov2_resultfile():
+        """Write summary csv report of Artic and Pangolin results"""
+
+        ticket = self.ticket
+        today = self.today
+        results = self.articdata
+
+
+        summaryfile = os.path.join(
+            indir, "sars-cov-2_{}_results_{}.csv".format(ticket, today)
+        )
+        with open(summaryfile, mode="w") as out:
+            summary = csv.writer(out)
+            summary.writerow(
+                [
+                    "Sample",
+                    "Selection",
+                    "Ticket",
+                    "%N_bases",
+                    "%10X_coverage",
+                    "QC_pass",
+                    "Lineage",
+                    "PangoLEARN_version",
+                    "VOC",
+                    "Variants",
+                ]
+            )
+            for sample, data in results.items():
+                selection = "-"
+                row = [
+                    sample,
+                    selection,
+                    ticket,
+                    data["pct_n_bases"],
+                    data["pct_10X_bases"],
+                    data["qc"],
+                    data["lineage"],
+                    data["pangoLEARN_version"],
+                    data["VOC"],
+                    data["VOC_aa"],
+                ]
+                summary.writerow(row)
+
+
+    def create_sarscov2_variantfile():
+        """Write variant csv report of identified variants
+        I am literally just variant_summary.csv but with sample names"""
+
+        indir = self.indir
+        ticket = self.ticket
+        today = self.today
+
+        varRep = glob.glob(os.path.join(indir, "*variant_summary.csv"))[0]
+        varout = os.path.join(indir, "sars-cov-2_{}_variants_{}.csv".format(ticket, today))
+        if os.stat(varRep).st_size != 0:
+            with open(varRep) as f, open(varout, mode="w") as out:
+                variants = f.readlines()
+                varsummary = csv.writer(out)
+                varsummary.writerow(variants[0].strip().split(","))
+                for line in variants[1:]:
+                    line = line.strip().split(",")
+                    varsummary.writerow([line[0].split("_")[-1]] + line[1:])
+        else:
+            try:
+                open(varout, "a").close()
+            except Exception as e:
+                print("Failed creating file {}\n{}".format(varout, e))
+
+
+    def create_jsonfile():
+     
+        """Output all result data in a json format for easy parsing"""
+
+        with open("{}/{}_{}".format(self.indir, self.ticket, self.today, "w") as outfile:
+            json.dump(self.articdata, outfile)
+
+
+    def parse_artic_csv():
+        """Parse artic output directory for analysis results. Returns dictionary data object"""
+        indir = self.indir
+        voc_pos = range(475, 486)
+        voc_pos_aa=["L452R"]
+        voc_strains = get_json("{0}/voc_strains.json".format(os.path.dirname(os.path.realpath(__file__))))
+
+
+        artic_data = dict()
+        var_all = dict()
+        var_voc = dict()
+
+        # Files of interest. ONLY ADD TO END OF THIS LIST
+        files = [
+            "*qc.csv",
+            "*variant_summary.csv",
+            "ncovIllumina_sequenceAnalysis_makeConsensus/*pangolin.csv",
+        ]
+        paths = list()
+        for f in files:
+            try:
+                hits = glob.glob(os.path.join(indir, f))
+                if len(hits) == 0:
+                    raise Exception("File not found")
+                if len(hits) > 1:
+                    print(
+                        "Multiple hits for {0}/{1}, picking {2}".format(indir, f, hits[0])
+                    )
+                paths.append(hits[0])
+            except Exception as e:
+                print("Unable to find {0} in {1} ({2})".format(f, indir, e))
+                sys.exit(-1)
+
+        # Parse qc report data
+        with open(paths[0]) as f:
+            content = csv.reader(f)
+            next(content)
+            for line in content:
+                sample = line[0].split("_")[-1]
+                if float(line[2]) > 95:
+                    passed = "TRUE"
+                else:
+                    passed = "FALSE"
+                artic_data[sample] = {
+                    "pct_n_bases": line[1],
+                    "pct_10X_bases": line[2],
+                    "longest_no_N_run": line[3],
+                    "num_aligned_reads": line[4],
+                    "artic_qc": line[7],
+                    "qc": passed,
+                }
+        # Parse Pangolin report data
+        with open(paths[2]) as f:
+            content = csv.reader(f)
+            next(content)
+            for line in content:
+                sample = line[0].split(".")[0].split("_")[-1]
+                lineage = line[1]
+                if lineage in voc_strains:
+                    voc = "Yes"
+                elif lineage == "None":
+                    voc = "-"
+                else:
+                    voc = "No"
+                artic_data[sample].update(
+                    {
+                        "lineage": lineage,
+                        "pangolin_probability": line[2],
+                        "pangoLEARN_version": line[3],
+                        "pangolin_qc": line[4],
+                        "VOC": voc,
+                    }
+                )
+        # Parse Variant report data
+        if os.stat(paths[1]).st_size != 0:
+            with open(paths[1]) as f:
+                content = csv.reader(f)
+                next(content)
+                for line in content:
+                    sample = line[0].split("_")[-1]
+                    variant = line[2]
+                    pos = int(re.findall(r"\d+", variant)[0])
+                    if (pos in voc_pos) or (variant in voc_pos_aa):
+                        append_dict(var_voc, sample, variant)
+                    append_dict(var_all, sample, variant)
+        # Add variant data to results
+        if var_voc:
+            for sample in artic_data.keys():
+                if sample in var_voc.keys():
+                    artic_data[sample].update({"VOC_aa": ";".join(var_voc[sample])})
+                else:
+                    artic_data[sample].update({"VOC_aa": "-"})
+        else:
+            for sample in artic_data.keys():
+                artic_data[sample].update({"VOC_aa": "-"})
+        if var_all:
+            for sample in artic_data.keys():
+                if sample in var_all.keys():
+                    if len(var_all[sample]) > 1:
+                        artic_data[sample].update({"variants": ";".join(var_all[sample])})
+                    else:
+                        artic_data[sample].update({"variants": var_all[sample]})
+                else:
+                    artic_data[sample].update({"variants": "-"})
+        self.artic_data = artic_data
 
     def create_deliveryfile(self):
 
