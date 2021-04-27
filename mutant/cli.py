@@ -89,11 +89,7 @@ def sarscov2(
             config_artic=config_artic,
             timestamp=TIMESTAMP,
         )
-        report.create_fohm_csv()
-        report.create_concat_pangolinfile()
-        report.rename_deliverables()
-        report.create_deliveryfile()
-        report.create_trailblazer_config()
+        report.create_all_files()
 
     # Deliverables
     if config_case != "":
@@ -138,7 +134,7 @@ def sarscov2(ctx):
 @click.option("--config_case", help="Provided config for the case", required=True)
 @click.pass_context
 def cgmodifications(ctx, input_folder, config_artic, config_case):
-    """Applies all cg modifications as a batch"""
+    """Applies all cg post-processing, skipping nextflow pipeline"""
 
     # Reports
     if config_case != "":
@@ -148,8 +144,7 @@ def cgmodifications(ctx, input_folder, config_artic, config_case):
             config_artic=config_artic,
             timestamp=TIMESTAMP,
         )
-        report.create_deliveryfile()
-        report.create_fohm_csv()
+        report.create_all_files()
 
     # Deliverables
     if config_case != "":
@@ -186,55 +181,6 @@ def rename(ctx, input_folder, config_artic, config_case):
             timestamp=TIMESTAMP,
         )
         delivery.rename_deliverables()
-
-
-@sarscov2.command()
-@click.argument("input_folder")
-@click.option(
-    "--config_artic",
-    help="Custom artic configuration file",
-    default="{}/config/hasta/artic.json".format(WD),
-)
-@click.option("--config_case", help="Provided config for the case", required=True)
-@click.pass_context
-def reportfile(ctx, input_folder, config_artic, config_case):
-    """CG specific report file"""
-
-    # Reports
-    if config_case != "":
-        report = ReportSC2(
-            caseinfo=config_case,
-            resdir=os.path.abspath(input_folder),
-            fastq_dir=os.path.abspath(input_folder),
-            config_artic=config_artic,
-            timestamp=TIMESTAMP,
-        )
-        report.create_deliveryfile()
-
-
-@sarscov2.command()
-@click.argument("input_folder")
-@click.option(
-    "--config_artic",
-    help="Custom artic configuration file",
-    default="{}/config/hasta/artic.json".format(WD),
-)
-@click.option("--config_case", help="Provided config for the case", required=True)
-@click.pass_context
-def fohmfile(ctx, input_folder, config_artic, config_case):
-    """FoHM demanded delivery file"""
-
-    # Reports
-    if config_case != "":
-        report = ReportSC2(
-            caseinfo=config_case,
-            resdir=os.path.abspath(input_folder),
-            fastq_dir=os.path.abspath(input_folder),
-            config_artic=config_artic,
-            timestamp=TIMESTAMP,
-        )
-        report.create_fohm_csv()
-
 
 @toolbox.command()
 @click.argument("input_folder")

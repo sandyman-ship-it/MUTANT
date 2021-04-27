@@ -37,6 +37,14 @@ class ReportSC2:
         self.today = today
         self.fastq_dir = fastq_dir
 
+
+    def create_all_files(self):
+        self.create_trailblazer_config()
+        self.create_concat_pangolin()
+        self.create_deliveryfile()
+        self.create_fohm_csv()
+
+
     def get_finished_slurm_ids(self) -> list:
         trace_file_path = Path(self.indir, "pipeline_info", "execution_trace.txt")
         slurm_id_list = []
@@ -57,47 +65,7 @@ class ReportSC2:
         with open(trailblazer_config_path, "w") as trailblazer_config_file:
             yaml.dump(data={"jobs": finished_slurm_ids}, stream=trailblazer_config_file)
 
-    def rename_deliverables(self):
-        """Rename result files for delivery: fastq, consensus files, vcf and pangolin"""
-
-        for sampleinfo in self.caseinfo:
-            sample = sampleinfo["CG_ID_sample"]
-            region = sampleinfo["region_code"]
-            lab = sampleinfo["lab_code"]
-            base_sample = "{0}_{1}_{2}".format(
-                region, lab, sampleinfo["Customer_ID_sample"]
-            )
-            if not sampleinfo["sequencing_qc_pass"]:
-                continue
-
-            # rename makeConsensus
-            prefix = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(
-                self.indir
-            )
-            for item in glob.glob("{0}/{1}.*".format(prefix, base_sample)):
-                newpath = "{0}/{1}.consensus.fasta".format(prefix, base_sample)
-                os.symlink(item, newpath)
-
-            # rename typeVariants
-            prefix = "{0}/ncovIllumina_Genotyping_typeVariants/vcf".format(self.indir)
-            for item in glob.glob("{0}/{1}.csq.vcf".format(prefix, base_sample)):
-                newpath = "{0}/{1}.vcf".format(prefix, base_sample)
-                os.symlink(item, newpath)
-
-            # rename core
-            core_suffix = [
-                ".qc.csv",
-                ".pangolin.csv",
-                ".typing_summary.csv",
-                ".variant_summary.csv",
-            ]
-            for thing in core_suffix:
-                hit = glob.glob("{0}/*{1}".format(self.indir, thing))
-                if len(hit) == 1:
-                    hit = hit[0]
-                    os.symlink(hit, "{0}/{1}{2}".format(self.indir, self.ticket, thing))
-
-    def create_concat_pangolinfile(self):
+    def create_concat_pangolin(self):
 
         indir = "{0}/ncovIllumina_sequenceAnalysis_pangolinTyping".format(self.indir)
 
@@ -108,6 +76,35 @@ class ReportSC2:
                 concat.write(single.read())
                 concat.write("\n")
         concat.close()
+
+    def create_fohm_csv(self):
+
+        """Creates a summary file for FoHM for each region-lab-combination"""
+
+        # Add header to summary files
+        for regionlab in self.regionlabs:
+            sumfile = os.path.join(
+                self.indir,
+                "{}_{}_komplettering.csv".format(regionlab, self.today),
+            )
+            with open(sumfile, "w") as summary:
+                summary.write("provnummer,urvalskriterium,GISAID_accession\n")
+
+        # Write sample information to corresponding summary file
+        for record in self.caseinfo:
+            region = record["region_code"]
+            lab = record["lab_code"]
+            sumfile = os.path.join(
+                self.indir, "{}_{}_{}_komplettering.csv".format(region, lab, self.today)
+            )
+            with open(sumfile, "a") as out:
+                summary = csv.writer(out)
+                summary.writerow(
+                    [
+                        record["Customer_ID_sample"],
+                        record["selection_criteria"],
+                    ]
+                )
 
 
     def create_deliveryfile(self):
@@ -315,32 +312,3 @@ class ReportSC2:
             )
         with open(delivfile, "w") as out:
             yaml.dump(deliv, out)
-
-    def create_fohm_csv(self):
-
-        """Creates a summary file for FoHM for each region-lab-combination"""
-
-        # Add header to summary files
-        for regionlab in self.regionlabs:
-            sumfile = os.path.join(
-                self.indir,
-                "{}_{}_komplettering.csv".format(regionlab, self.today),
-            )
-            with open(sumfile, "w") as summary:
-                summary.write("provnummer,urvalskriterium,GISAID_accession\n")
-
-        # Write sample information to corresponding summary file
-        for record in self.caseinfo:
-            region = record["region_code"]
-            lab = record["lab_code"]
-            sumfile = os.path.join(
-                self.indir, "{}_{}_{}_komplettering.csv".format(region, lab, self.today)
-            )
-            with open(sumfile, "a") as out:
-                summary = csv.writer(out)
-                summary.writerow(
-                    [
-                        record["Customer_ID_sample"],
-                        record["selection_criteria"],
-                    ]
-                )
