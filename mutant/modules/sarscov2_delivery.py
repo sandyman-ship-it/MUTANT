@@ -18,7 +18,7 @@ from mutant.modules.generic_parser import get_sarscov2_config
 
 
 class DeliverySC2:
-    def __init__(self, caseinfo, resdir, config_artic, fastq_dir, timestamp):
+    def __init__(self, caseinfo, indir):
         self.casefile = caseinfo
         caseinfo = get_sarscov2_config(caseinfo)
 
@@ -32,12 +32,7 @@ class DeliverySC2:
         self.ticket = caseinfo[0]["Customer_ID_project"]
         self.project = caseinfo[0]["Customer_ID_project"]
         self.regionlabs = regionlab_list
-        self.indir = resdir
-        self.config_artic = config_artic
-        self.time = timestamp
-        today = date.today().strftime("%Y%m%d")
-        self.today = today
-        self.fastq_dir = fastq_dir
+        self.indir = indir
 
     def rename_deliverables(self):
         """Rename result files for delivery: fastq, consensus files, vcf and pangolin"""

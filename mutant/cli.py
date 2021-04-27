@@ -96,10 +96,7 @@ def sarscov2(
     if config_case != "":
         delivery = DeliverySC2(
             caseinfo=config_case,
-            resdir=os.path.abspath(resdir),
-            fastq_dir=os.path.abspath(input_folder),
-            config_artic=config_artic,
-            timestamp=TIMESTAMP,
+            indir=os.path.abspath(resdir),
         )
 
         delivery.rename_deliverables()
@@ -132,27 +129,27 @@ def sarscov2(ctx):
 )
 @click.option("--config_case", help="Provided config for the case", required=True)
 @click.pass_context
-def cgmodifications(ctx, input_folder, config_artic, config_case):
-    """Applies all cg post-processing, skipping nextflow pipeline"""
+def postproc(ctx, input_folder, config_artic, config_case):
+    """Applies all cg post-processing of the sarscov2 pipeline"""
+
 
     # Reports
     if config_case != "":
         report = ReportSC2(
             caseinfo=config_case,
-            resdir=os.path.abspath(input_folder),
+            resdir=os.path.abspath(resdir),
             config_artic=config_artic,
+            fastq_dir=os.path.abspath(input_folder),
             timestamp=TIMESTAMP,
         )
+
         report.create_all_files()
 
     # Deliverables
     if config_case != "":
         delivery = DeliverySC2(
             caseinfo=config_case,
-            resdir=os.path.abspath(resdir),
-            fastq_dir=os.path.abspath(input_folder),
-            config_artic=config_artic,
-            timestamp=TIMESTAMP,
+            indir=os.path.abspath(resdir),
         )
 
         delivery.rename_deliverables()
@@ -168,32 +165,15 @@ def cgmodifications(ctx, input_folder, config_artic, config_case):
 @click.option("--config_case", help="Provided config for the case", required=True)
 @click.pass_context
 def rename(ctx, input_folder, config_artic, config_case):
-    """Renames covid output to CG standard"""
+    """Renames sarcov2 pipeline output to CG standard"""
 
-    # Reports
+    # Delivery
     if config_case != "":
         delivery = DeliverySC2(
             caseinfo=config_case,
-            resdir=os.path.abspath(input_folder),
-            fastq_dir=os.path.abspath(input_folder),
-            config_artic=config_artic,
-            timestamp=TIMESTAMP,
+            indir=os.path.abspath(input_folder),
         )
         delivery.rename_deliverables()
-
-
-@toolbox.command()
-@click.argument("input_folder")
-@click.argument("ticket_number")
-@click.pass_context
-def ArticReport(ctx, input_folder, ticket_number):
-    """KS Typing Report of the ARTIC pipeline"""
-    cmd = "python {0}/standalone/ks_typing_report.py {1} {2}".format(
-        WD, input_folder, ticket_number
-    )
-    log.debug("Command ran: {}".format(cmd))
-    proc = subprocess.Popen(cmd.split())
-    out, err = proc.communicate()
 
 
 @toolbox.command()

@@ -127,6 +127,7 @@ class ReportSC2:
         ticket = self.ticket
         today = self.today
         results = self.articdata
+        indir = self.indir
 
         summaryfile = os.path.join(
             indir, "sars-cov-2_{}_results_{}.csv".format(ticket, today)
