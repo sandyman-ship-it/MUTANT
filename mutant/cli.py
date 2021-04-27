@@ -105,8 +105,6 @@ def sarscov2(
         delivery.rename_deliverables()
 
 
-
-
 @analyse.command()
 @click.pass_context
 def jasen(ctx):
@@ -182,6 +180,7 @@ def rename(ctx, input_folder, config_artic, config_case):
             timestamp=TIMESTAMP,
         )
         delivery.rename_deliverables()
+
 
 @toolbox.command()
 @click.argument("input_folder")

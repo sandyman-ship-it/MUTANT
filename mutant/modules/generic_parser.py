@@ -3,12 +3,14 @@ import sys
 import json
 import click
 
+
 def append_dict(dictionary, key, item):
     if key in dictionary.keys():
         dictionary[key].append(item)
     else:
         dictionary[key] = [item]
     return dictionary
+
 
 def get_json(config):
     """Read json file"""
