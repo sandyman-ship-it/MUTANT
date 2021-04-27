@@ -71,7 +71,7 @@ class ReportSC2:
 
         concat = open("{0}/{1}.pangolin.csv".format(self.indir, self.ticket), "w+")
 
-        for item in glob.glob("{0}/*.csv".format(indir):
+        for item in glob.glob("{0}/*.csv".format(indir)):
                 single = open(item, "r")
                 concat.write(single.read())
                 concat.write("\n")
