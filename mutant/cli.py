@@ -13,6 +13,7 @@ from mutant import version, log
 from mutant.modules.sarscov2_start import RunSC2
 from mutant.modules.generic_parser import get_json
 from mutant.modules.sarscov2_report import ReportSC2
+from mutant.modules.sarscov2_delivery import DeliverySC2
 
 # File work directory
 WD = os.path.dirname(os.path.realpath(__file__))
@@ -93,7 +94,7 @@ def sarscov2(
 
     # Deliverables
     if config_case != "":
-        report = ReportSC2(
+        delivery = DeliverySC2(
             caseinfo=config_case,
             resdir=os.path.abspath(resdir),
             fastq_dir=os.path.abspath(input_folder),
@@ -148,7 +149,7 @@ def cgmodifications(ctx, input_folder, config_artic, config_case):
 
     # Deliverables
     if config_case != "":
-        report = ReportSC2(
+        delivery = DeliverySC2(
             caseinfo=config_case,
             resdir=os.path.abspath(resdir),
             fastq_dir=os.path.abspath(input_folder),
@@ -173,7 +174,7 @@ def rename(ctx, input_folder, config_artic, config_case):
 
     # Reports
     if config_case != "":
-        report = DeliverySC2(
+        delivery = DeliverySC2(
             caseinfo=config_case,
             resdir=os.path.abspath(input_folder),
             fastq_dir=os.path.abspath(input_folder),
