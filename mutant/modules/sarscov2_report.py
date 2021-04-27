@@ -15,7 +15,7 @@ import yaml
 from mutant.modules.generic_parser import get_sarscov2_config
 
 
-class DeliverSC2:
+class ReportSC2:
     def __init__(self, caseinfo, resdir, config_artic, fastq_dir, timestamp):
         self.casefile = caseinfo
         caseinfo = get_sarscov2_config(caseinfo)

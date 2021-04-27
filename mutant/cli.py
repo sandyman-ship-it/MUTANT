@@ -12,7 +12,7 @@ import click
 from mutant import version, log
 from mutant.modules.sarscov2_start import RunSC2
 from mutant.modules.generic_parser import get_json
-from mutant.modules.sarscov2_report import DeliverSC2
+from mutant.modules.sarscov2_report import ReportSC2
 
 # File work directory
 WD = os.path.dirname(os.path.realpath(__file__))
@@ -80,20 +80,32 @@ def sarscov2(
     resdir = run.get_results_dir(config_mutant, outdir)
     run.run_case(resdir)
 
-    # Deliverables
+    # Report
     if config_case != "":
-        delivery = DeliverSC2(
+        report = ReportSC2(
             caseinfo=config_case,
             resdir=os.path.abspath(resdir),
             fastq_dir=os.path.abspath(input_folder),
             config_artic=config_artic,
             timestamp=TIMESTAMP,
         )
-        delivery.create_fohm_csv()
-        delivery.create_concat_pangolinfile()
+        report.create_fohm_csv()
+        report.create_concat_pangolinfile()
+        report.rename_deliverables()
+        report.create_deliveryfile()
+        report.create_trailblazer_config()
+
+    # Deliverables
+    if config_case != "":
+        report = ReportSC2(
+            caseinfo=config_case,
+            resdir=os.path.abspath(resdir),
+            fastq_dir=os.path.abspath(input_folder),
+            config_artic=config_artic,
+            timestamp=TIMESTAMP,
+        )
+
         delivery.rename_deliverables()
-        delivery.create_deliveryfile()
-        delivery.create_trailblazer_config()
 
 
 
@@ -128,17 +140,28 @@ def sarscov2(ctx):
 def cgmodifications(ctx, input_folder, config_artic, config_case):
     """Applies all cg modifications as a batch"""
 
-    # Deliverables
+    # Reports
     if config_case != "":
-        delivery = DeliverSC2(
+        report = ReportSC2(
             caseinfo=config_case,
             resdir=os.path.abspath(input_folder),
             config_artic=config_artic,
             timestamp=TIMESTAMP,
         )
+        report.create_deliveryfile()
+        report.create_fohm_csv()
+
+    # Deliverables
+    if config_case != "":
+        report = ReportSC2(
+            caseinfo=config_case,
+            resdir=os.path.abspath(resdir),
+            fastq_dir=os.path.abspath(input_folder),
+            config_artic=config_artic,
+            timestamp=TIMESTAMP,
+        )
+
         delivery.rename_deliverables()
-        delivery.create_deliveryfile()
-        delivery.create_fohm_csv()
 
 
 @sarscov2.command()
@@ -153,9 +176,9 @@ def cgmodifications(ctx, input_folder, config_artic, config_case):
 def rename(ctx, input_folder, config_artic, config_case):
     """Renames covid output to CG standard"""
 
-    # Deliverables
+    # Reports
     if config_case != "":
-        delivery = DeliverSC2(
+        report = DeliverySC2(
             caseinfo=config_case,
             resdir=os.path.abspath(input_folder),
             fastq_dir=os.path.abspath(input_folder),
@@ -174,19 +197,19 @@ def rename(ctx, input_folder, config_artic, config_case):
 )
 @click.option("--config_case", help="Provided config for the case", required=True)
 @click.pass_context
-def deliveryfile(ctx, input_folder, config_artic, config_case):
-    """CG specific delivery file"""
+def reportfile(ctx, input_folder, config_artic, config_case):
+    """CG specific report file"""
 
-    # Deliverables
+    # Reports
     if config_case != "":
-        delivery = DeliverSC2(
+        report = ReportSC2(
             caseinfo=config_case,
             resdir=os.path.abspath(input_folder),
             fastq_dir=os.path.abspath(input_folder),
             config_artic=config_artic,
             timestamp=TIMESTAMP,
         )
-        delivery.create_deliveryfile()
+        report.create_deliveryfile()
 
 
 @sarscov2.command()
@@ -201,16 +224,16 @@ def deliveryfile(ctx, input_folder, config_artic, config_case):
 def fohmfile(ctx, input_folder, config_artic, config_case):
     """FoHM demanded delivery file"""
 
-    # Deliverables
+    # Reports
     if config_case != "":
-        delivery = DeliverSC2(
+        report = ReportSC2(
             caseinfo=config_case,
             resdir=os.path.abspath(input_folder),
             fastq_dir=os.path.abspath(input_folder),
             config_artic=config_artic,
             timestamp=TIMESTAMP,
         )
-        delivery.create_fohm_csv()
+        report.create_fohm_csv()
 
 
 @toolbox.command()
