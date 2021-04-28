@@ -85,7 +85,7 @@ def sarscov2(
     if config_case != "":
         report = ReportSC2(
             caseinfo=config_case,
-            resdir=os.path.abspath(resdir),
+            indir=os.path.abspath(resdir),
             fastq_dir=os.path.abspath(input_folder),
             config_artic=config_artic,
             timestamp=TIMESTAMP,
