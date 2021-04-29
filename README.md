@@ -27,6 +27,7 @@ Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
 
 ### Self-test
 * `source activate D_mutant`
+* `cd MUTANT`
 * `mutant analyse sarscov2 tests/testdata/fasta_files --profiles local,singularity --config_artic mutant/config/local/artic.json --config_mutant mutant/config/local/mutant.json --config_case tests/testdata/MIC3109_artic.json` 
 * Wait for pipeline completion (~3m). Check results in `./results/` 
 
@@ -36,4 +37,5 @@ MUTANTs versioning is bumped manually post PR merge, using [semver](https://semv
 
 ## Deploying new version
 Determine if instance is either 'production' or stage.
-`bash /home/onyx/tmp/MUTANT/mutant/standalone/deploy_hasta_update.sh <INSTANCE>`
+* `cd MUTANT`
+* `bash mutant/standalone/deploy_hasta_update.sh <INSTANCE>`
