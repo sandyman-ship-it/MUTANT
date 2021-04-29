@@ -9,33 +9,47 @@ import re
 import subprocess
 import sys
 
-from datetime import date
+from argparse import ArgumentParser
 from pathlib import Path
 
 
-if len(sys.argv) > 3 or len(sys.argv) < 2:
-    print("Usage: concatenate.py <input_folder> <app_tag> OR concatenate.py <input_folder>")
+PREFIX_TO_CONCATENATE = ["MWG", "MWL", "MWM", "MWR", "MWX", "CONCATENATE"]
+parser = ArgumentParser()
+
+parser.add_argument("-i",
+                    "--input_folder",
+                    dest="input_folder",
+                    help="Folder with fastq to concatenate",
+                    metavar="<PATH>",
+                    required=True,
+                    type=str)
+parser.add_argument("-a",
+                    "--app_tag",
+                    dest="app_tag",
+                    help="Application tag",
+                    metavar="<STRING>",
+                    required=False,
+                    type=str,
+                    default="CONCATENATE")
+parser.add_argument("-d",
+                    "--date",
+                    dest="date",
+                    help="Date to add to the concatenated file name, e.g. order date",
+                    metavar="<DATE>",
+                    required=False,
+                    type=str,
+                    default="")
+
+args = parser.parse_args()
+
+if args.app_tag not in PREFIX_TO_CONCATENATE:
+    print("Data with application tag %s should not be concatenated, skipping concatenation" % (args.app_tag))
     sys.exit(-1)
+else:
+    print("Apptag %s identified, data generated with this application tag should be concatenated" % (args.app_tag))
 
-base_path = sys.argv[1]
-
-if len(sys.argv) == 3:
-    app_tag = sys.argv[2]
-
-    PREFIX_TO_CONCATENATE = ["MWG", "MWL", "MWM", "MWR", "MWX"]
-    should_concatenate = False
-
-    for prefix in PREFIX_TO_CONCATENATE:
-        if app_tag.startswith(prefix):
-            print("Apptag %s identified, data generated with this application tag should be concatenated" % (app_tag))
-            should_concatenate = True
-
-    if should_concatenate == False:
-        print("Data with application tag %s should not be concatenated, skipping concatenation" % (app_tag))
-        sys.exit(-1)
-
-for dir_name in os.listdir(base_path):
-    dir_path = os.path.join(base_path, dir_name)
+for dir_name in os.listdir(args.input_folder):
+    dir_path = os.path.join(args.input_folder, dir_name)
     if len(os.listdir(dir_path)) == 0:
         print("Empty folder found: %s" % (dir_path))
         cmd = "rmdir " + str(dir_path)
@@ -58,9 +72,10 @@ for dir_name in os.listdir(base_path):
         cmd = "cat"
         for i in range(len(same_direction)):
             cmd = cmd + " " + same_direction[i]
-        today = date.today()
-        today_formatted = today.strftime("%y%m%d")
-        output = dir_path + "/" + today_formatted + "_" + dir_name + "_" + str(read_direction) + ".fastq.gz"
+        if args.date:
+            output = dir_path + "/" + str(args.date) + "_" + dir_name + "_" + str(read_direction) + ".fastq.gz"
+        else:
+            output = dir_path + "/" + dir_name + "_" + str(read_direction) + ".fastq.gz"
         cmd = cmd + " > " + output
         print("Running command: %s" % (cmd))
         os.system(cmd)
