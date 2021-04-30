@@ -7,13 +7,16 @@
 import csv
 import glob
 import json
+import re
 import os
+import sys
 import yaml 
 
 from datetime import date
 from pathlib import Path
 
-from mutant.modules.generic_parser import get_sarscov2_config, get_json
+from mutant import WD
+from mutant.modules.generic_parser import get_sarscov2_config, get_json, append_dict
 
 
 class ReportSC2:
@@ -45,6 +48,7 @@ class ReportSC2:
         self.create_concat_consensus()
         self.create_deliveryfile()
         self.create_fohm_csv()
+        self.load_vanilla_artic_results()
         self.create_sarscov2_resultfile()
         self.create_sarscov2_variantfile()
         self.create_jsonfile()
@@ -74,11 +78,12 @@ class ReportSC2:
         indir = "{0}/ncovIllumina_sequenceAnalysis_pangolinTyping".format(self.indir)
 
         concat = open("{0}/{1}.pangolin.csv".format(self.indir, self.ticket), "w+")
+        concat.write("taxon,lineage,probability,pangoLEARN_version,status,note\n")
+
 
         for item in glob.glob("{0}/*.csv".format(indir)):
             single = open(item, "r")
-            concat.write(single.read())
-            concat.write("\n")
+            concat.write('\n'.join(single.readlines()[1:]))
         concat.close()
 
     def create_concat_consensus(self):
@@ -86,7 +91,6 @@ class ReportSC2:
         indir = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(self.indir)
 
         concat = open("{0}/{1}.consensus.fa".format(self.indir, self.ticket), "w+")
-
         for item in glob.glob("{0}/*.consensus.fa".format(indir)):
             single = open(item, "r")
             concat.write(single.read())
@@ -127,6 +131,9 @@ class ReportSC2:
 
         ticket = self.ticket
         today = self.today
+        if self.articdata == dict():
+            print("No artic results loaded. Quitting sarscov2_resultfile")
+            sys.exit(-1)
         results = self.articdata
         indir = self.indir
 
@@ -192,22 +199,23 @@ class ReportSC2:
                 print("Failed creating file {}\n{}".format(varout, e))
 
     def create_jsonfile(self):
-
         """Output all result data in a json format for easy parsing"""
+
+        if self.articdata == dict():
+            print("No artic results loaded. Quitting create_jsonfile")
+            sys.exit(-1)
 
         with open(
             "{}/{}_{}".format(self.indir, self.ticket, self.today), "w"
         ) as outfile:
             json.dump(self.articdata, outfile)
 
-    def parse_artic_csv(self):
+    def load_vanilla_artic_results(self):
         """Parse artic output directory for analysis results. Returns dictionary data object"""
         indir = self.indir
         voc_pos = range(475, 486)
         voc_pos_aa = ["L452R"]
-        voc_strains = get_json(
-            "{0}/voc_strains.json".format(os.path.dirname(os.path.realpath(__file__)))
-        )
+        voc_strains = get_json("{0}/standalone/voc_strains.json".format(WD))['voc_strains']
 
         artic_data = dict()
         var_all = dict()
@@ -217,7 +225,7 @@ class ReportSC2:
         files = [
             "*qc.csv",
             "*variant_summary.csv",
-            "ncovIllumina_sequenceAnalysis_makeConsensus/*pangolin.csv",
+            "*pangolin.csv",
         ]
         paths = list()
         for f in files:
@@ -309,7 +317,7 @@ class ReportSC2:
                         artic_data[sample].update({"variants": var_all[sample]})
                 else:
                     artic_data[sample].update({"variants": "-"})
-        self.artic_data = artic_data
+        self.articdata = artic_data
 
     def create_deliveryfile(self):
 

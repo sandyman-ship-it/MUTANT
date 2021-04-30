@@ -9,16 +9,11 @@ from datetime import datetime
 
 import click
 
-from mutant import version, log
+from mutant import version, log, WD, TIMESTAMP
 from mutant.modules.sarscov2_start import RunSC2
 from mutant.modules.generic_parser import get_json
 from mutant.modules.sarscov2_report import ReportSC2
 from mutant.modules.sarscov2_delivery import DeliverySC2
-
-# File work directory
-WD = os.path.dirname(os.path.realpath(__file__))
-TIMESTAMP = datetime.now().strftime("%y%m%d-%H%M%S")
-
 
 @click.group()
 @click.version_option(version)
