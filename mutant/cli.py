@@ -68,16 +68,18 @@ def sarscov2(
         caseID = "artic"
     prefix = "{}_{}".format(caseID, TIMESTAMP)
 
+
     # Run
     run = RunSC2(
         input_folder=input_folder,
-        config_artic=config_artic,
         caseID=caseID,
+        config_artic=config_artic,
         prefix=prefix,
         profiles=profiles,
         timestamp=TIMESTAMP,
         WD=WD,
     )
+
     resdir = run.get_results_dir(config_mutant, outdir)
     run.run_case(resdir)
 
@@ -85,7 +87,7 @@ def sarscov2(
     if config_case != "":
         report = ReportSC2(
             caseinfo=config_case,
-            resdir=os.path.abspath(resdir),
+            indir=os.path.abspath(resdir),
             fastq_dir=os.path.abspath(input_folder),
             config_artic=config_artic,
             timestamp=TIMESTAMP,
