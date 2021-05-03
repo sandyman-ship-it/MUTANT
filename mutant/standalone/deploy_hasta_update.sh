@@ -15,7 +15,7 @@ INITIAL="$(echo $INSTANCE | head -c 1)"
 source activate ${INITIAL^}_mutant
 pip install -e .
 source deactivate
-cd externals/gms-artic
+cd mutant/externals/gms-artic
 git fetch
 git checkout origin master
 git pull origin master
