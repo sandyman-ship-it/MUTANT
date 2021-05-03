@@ -41,12 +41,16 @@ parser.add_argument("-d",
                     default="")
 
 args = parser.parse_args()
+should_concatenate = False
 
-if args.app_tag not in PREFIX_TO_CONCATENATE:
+for prefix in PREFIX_TO_CONCATENATE:
+    if args.app_tag.startswith(prefix):
+        print("Apptag %s identified, data generated with this application tag should be concatenated" % (args.app_tag))
+        should_concatenate = True
+
+if should_concatenate == False:
     print("Data with application tag %s should not be concatenated, skipping concatenation" % (args.app_tag))
     sys.exit(-1)
-else:
-    print("Apptag %s identified, data generated with this application tag should be concatenated" % (args.app_tag))
 
 for dir_name in os.listdir(args.input_folder):
     dir_path = os.path.join(args.input_folder, dir_name)
