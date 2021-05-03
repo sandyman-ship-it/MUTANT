@@ -81,7 +81,9 @@ for dir_name in os.listdir(args.input_folder):
         os.system(cmd)
         concatenated_size = Path(output).stat().st_size
         if total_size == concatenated_size:
-            print("QC PASSED: Total size for files used in concatenation match the size of the concatenated file")
+            print(
+                "QC PASSED: Total size for files used in concatenation match the size of the concatenated file"
+            )
             for file in same_direction:
                 inode_check_cmd = "stat -c %h " + file
                 n_inodes = subprocess.getoutput(inode_check_cmd)
@@ -89,6 +91,8 @@ for dir_name in os.listdir(args.input_folder):
                     print("Removing file: %s" % (file))
                     os.remove(file)
                 else:
-                    print("WARNING %s only got 1 inode, file will not be removed" % (file))
+                    print(
+                        "WARNING %s only got 1 inode, file will not be removed" % (file)
+                    )
         else:
             print("WARNING data lost in concatenation")

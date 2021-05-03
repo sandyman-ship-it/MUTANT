@@ -1,6 +1,14 @@
 import logging
+import os
+from datetime import datetime
 
-version = "3.5.2"
+version = "4.0.0"
+
+# File work directory
+WD = os.path.dirname(os.path.realpath(__file__))
+TIMESTAMP = datetime.now().strftime("%y%m%d-%H%M%S")
+
+
 
 # Initialize log
 log = logging.getLogger("main_log")

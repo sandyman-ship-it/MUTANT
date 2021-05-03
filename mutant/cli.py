@@ -9,21 +9,17 @@ from datetime import datetime
 
 import click
 
-from mutant import version, log
-from mutant.analysis.run_artic import RunSC2
-from mutant.modules.parse import get_json
-from mutant.postproc.deliver_artic import DeliverSC2
-
-# File work directory
-WD = os.path.dirname(os.path.realpath(__file__))
-TIMESTAMP = datetime.now().strftime("%y%m%d-%H%M%S")
-
+from mutant import version, log, WD, TIMESTAMP
+from mutant.modules.sarscov2_start import RunSC2
+from mutant.modules.generic_parser import get_json
+from mutant.modules.sarscov2_report import ReportSC2
+from mutant.modules.sarscov2_delivery import DeliverySC2
 
 @click.group()
 @click.version_option(version)
 @click.pass_context
 def root(ctx):
-    """ Microbial Utility Toolbox And wrapper for data traNsmission and Transformation """
+    """Microbial Utility Toolbox And wrapper for data traNsmission and Transformation"""
     ctx.obj = {}
 
 
@@ -46,10 +42,18 @@ def analyse(ctx):
     help="General configuration file for MUTANT",
     default="{}/config/hasta/mutant.json".format(WD),
 )
-@click.option("--outdir", help="Output folder to override general configutations", default="")
-@click.option("--profiles", help="Execution profiles, comma-separated", default="singularity,slurm")
+@click.option(
+    "--outdir", help="Output folder to override general configutations", default=""
+)
+@click.option(
+    "--profiles",
+    help="Execution profiles, comma-separated",
+    default="singularity,slurm",
+)
 @click.pass_context
-def sarscov2(ctx, input_folder, config_artic, config_case, config_mutant, outdir, profiles):
+def sarscov2(
+    ctx, input_folder, config_artic, config_case, config_mutant, outdir, profiles
+):
 
     # Set base for output files (Move this section)
     if config_case != "":
@@ -59,32 +63,40 @@ def sarscov2(ctx, input_folder, config_artic, config_case, config_mutant, outdir
         caseID = "artic"
     prefix = "{}_{}".format(caseID, TIMESTAMP)
 
+
     # Run
     run = RunSC2(
         input_folder=input_folder,
-        config_artic=config_artic,
         caseID=caseID,
+        config_artic=config_artic,
         prefix=prefix,
         profiles=profiles,
         timestamp=TIMESTAMP,
         WD=WD,
     )
+
     resdir = run.get_results_dir(config_mutant, outdir)
     run.run_case(resdir)
 
-    # Deliverables
+    # Report
     if config_case != "":
-        delivery = DeliverSC2(
+        report = ReportSC2(
             caseinfo=config_case,
-            resdir=os.path.abspath(resdir),
+            indir=os.path.abspath(resdir),
             fastq_dir=os.path.abspath(input_folder),
             config_artic=config_artic,
             timestamp=TIMESTAMP,
         )
-        delivery.create_fohm_csv()
+        report.create_all_files()
+
+    # Deliverables
+    if config_case != "":
+        delivery = DeliverySC2(
+            caseinfo=config_case,
+            indir=os.path.abspath(resdir),
+        )
+
         delivery.rename_deliverables()
-        delivery.create_deliveryfile()
-        delivery.create_trailblazer_config()
 
 
 @analyse.command()
@@ -112,22 +124,33 @@ def sarscov2(ctx):
     help="Custom artic configuration file",
     default="{}/config/hasta/artic.json".format(WD),
 )
+@click.option("--fastq_folder", help="Sequence data folder for the case", required=True)
 @click.option("--config_case", help="Provided config for the case", required=True)
 @click.pass_context
-def cgmodifications(ctx, input_folder, config_artic, config_case):
-    """Applies all cg modifications as a batch"""
+def postproc(ctx, input_folder, config_artic, fastq_folder, config_case):
+    """Applies all cg post-processing of the sarscov2 pipeline"""
+
+
+    # Reports
+    if config_case != "":
+        report = ReportSC2(
+            caseinfo=config_case,
+            indir=os.path.abspath(input_folder),
+            config_artic=config_artic,
+            fastq_dir=os.path.abspath(fastq_folder),
+            timestamp=TIMESTAMP,
+        )
+
+        report.create_all_files()
 
     # Deliverables
     if config_case != "":
-        delivery = DeliverSC2(
+        delivery = DeliverySC2(
             caseinfo=config_case,
-            resdir=os.path.abspath(input_folder),
-            config_artic=config_artic,
-            timestamp=TIMESTAMP,
+            indir=os.path.abspath(input_folder),
         )
+
         delivery.rename_deliverables()
-        delivery.create_deliveryfile()
-        delivery.create_fohm_csv()
 
 
 @sarscov2.command()
@@ -140,78 +163,15 @@ def cgmodifications(ctx, input_folder, config_artic, config_case):
 @click.option("--config_case", help="Provided config for the case", required=True)
 @click.pass_context
 def rename(ctx, input_folder, config_artic, config_case):
-    """Renames covid output to CG standard"""
+    """Renames sarcov2 pipeline output to CG standard"""
 
-    # Deliverables
+    # Delivery
     if config_case != "":
-        delivery = DeliverSC2(
+        delivery = DeliverySC2(
             caseinfo=config_case,
-            resdir=os.path.abspath(input_folder),
-            fastq_dir=os.path.abspath(input_folder),
-            config_artic=config_artic,
-            timestamp=TIMESTAMP,
+            indir=os.path.abspath(input_folder),
         )
         delivery.rename_deliverables()
-
-
-@sarscov2.command()
-@click.argument("input_folder")
-@click.option(
-    "--config_artic",
-    help="Custom artic configuration file",
-    default="{}/config/hasta/artic.json".format(WD),
-)
-@click.option("--config_case", help="Provided config for the case", required=True)
-@click.pass_context
-def deliveryfile(ctx, input_folder, config_artic, config_case):
-    """Generates CG specific delivery file"""
-
-    # Deliverables
-    if config_case != "":
-        delivery = DeliverSC2(
-            caseinfo=config_case,
-            resdir=os.path.abspath(input_folder),
-            fastq_dir=os.path.abspath(input_folder),
-            config_artic=config_artic,
-            timestamp=TIMESTAMP,
-        )
-        delivery.create_deliveryfile()
-
-
-@sarscov2.command()
-@click.argument("input_folder")
-@click.option(
-    "--config_artic",
-    help="Custom artic configuration file",
-    default="{}/config/hasta/artic.json".format(WD),
-)
-@click.option("--config_case", help="Provided config for the case", required=True)
-@click.pass_context
-def fohmfile(ctx, input_folder, config_artic, config_case):
-    """Generates FoHM demanded delivery file"""
-
-    # Deliverables
-    if config_case != "":
-        delivery = DeliverSC2(
-            caseinfo=config_case,
-            resdir=os.path.abspath(input_folder),
-            fastq_dir=os.path.abspath(input_folder),
-            config_artic=config_artic,
-            timestamp=TIMESTAMP,
-        )
-        delivery.create_fohm_csv()
-
-
-@toolbox.command()
-@click.argument("input_folder")
-@click.argument("ticket_number")
-@click.pass_context
-def ArticReport(ctx, input_folder, ticket_number):
-    """Report for QC output of the ARTIC pipeline"""
-    cmd = "python {0}/standalone/artic_report.py {1} {2}".format(WD, input_folder, ticket_number)
-    log.debug("Command ran: {}".format(cmd))
-    proc = subprocess.Popen(cmd.split())
-    out, err = proc.communicate()
 
 
 @toolbox.command()
@@ -232,11 +192,11 @@ def concatenate(ctx, input_folder, app_tag, date):
 
 @toolbox.command()
 @click.pass_context
-def sarscov2images(ctx):
-    """ Builds the sarscov2 pipeline images """
+def create_images(ctx):
+    """Builds the sarscov2 pipeline images"""
     bdir = os.getcwd()
     os.chdir("{0}/externals/gms-artic".format(WD))
-    cmd = "bash scripts/build_singularity_containers.sh"
+    cmd = "bash scripts/build_singularity_containers.sh && chmod 0777 *.sif"
     log.debug("Command ran: {}".format(cmd))
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()

@@ -8,7 +8,7 @@
 - `pip install -e .`
 
 ### How to test:
-- `mutant analyse sarscov2 tests/testdata/fasta_files --profiles local,singularity --config_artic mutant/config/local/artic.json --config_mutant mutant/config/local/mutant.json`
+- `mutant analyse sarscov2 tests/testdata/fasta_files --profiles local,singularity --config_artic mutant/config/local/artic.json --config_mutant mutant/config/local/mutant.json --config_case tests/testdata/MIC3109_artic.json`
 
 ### Expected outcome:
 - [ ] Produced files contain expected values
