@@ -175,14 +175,16 @@ def rename(ctx, input_folder, config_artic, config_case):
 
 
 @toolbox.command()
-@click.argument("input_folder")
-@click.argument("app_tag")
+@click.option("--input_folder", help="Folder with fastq to concatenate", required=True)
+@click.option("--app_tag", help="Application tag", required=False, default="CONCATENATE")
+@click.option("--date", help="Date to add to the concatenated file name, e.g. order date", required=False, default=None)
 @click.pass_context
-def concatenate(ctx, input_folder, app_tag):
-    """Concatenates fastq files if needed"""
-    cmd = "python {0}/standalone/concatenate.py {1} {2}".format(
-        WD, input_folder, app_tag
-    )
+def concatenate(ctx, input_folder, app_tag, date):
+    """ Concatenates fastq files if needed """
+    if date:
+        cmd = "python {0}/standalone/concatenate.py --input_folder {1} --app_tag {2} --date {3}".format(WD, input_folder, app_tag, date)
+    else:
+        cmd = "python {0}/standalone/concatenate.py --input_folder {1} --app_tag {2}".format(WD, input_folder, app_tag)
     log.debug("Command ran: {}".format(cmd))
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
