@@ -7,11 +7,12 @@ import click
 import json
 import subprocess
 from mutant import version, log
-from mutant.modules.parse import get_json
+from mutant.modules.generic_parser import get_json
+
 
 class RunSC2:
-
-    def __init__(self, input_folder, config_artic, caseID, prefix, profiles, timestamp, WD):
+    def __init__(
+        self, input_folder, caseID, prefix, profiles, timestamp, WD, config_artic=""):
 
         self.fastq = input_folder
         self.timestamp = timestamp
@@ -29,10 +30,12 @@ class RunSC2:
             resdir = outdir
         elif config != "":
             general_config = get_json(config)
-            resdir = os.path.join(general_config["SARS-CoV-2"]["folders"]["results"], "{}_{}".format(
-                self.case, self.timestamp))
+            resdir = os.path.abspath(os.path.join(
+                general_config["SARS-CoV-2"]["folders"]["results"],
+                "{}_{}".format(self.case, self.timestamp),
+            ))
         else:
-            resdir = "results"
+            resdir = os.path.abspath("results")
         return resdir
 
     def run_case(self, resdir):
@@ -46,8 +49,16 @@ class RunSC2:
         if self.config_artic != "":
             confline = "-C {0}".format(self.config_artic)
 
-        cmd = 'nextflow {0} -log {1} run {2} {3}/externals/gms-artic/main.nf -profile {4} --illumina --prefix {5} ' \
-              '--directory {6} {7}'.format(confline, nflog, workline, self.WD, self.profiles, self.prefix, self.fastq, resultsline)
+        cmd = "nextflow {0} -log {1} run {2} {3}/externals/gms-artic/main.nf -profile {4} --illumina --prefix {5} " "--directory {6} {7}".format(
+            confline,
+            nflog,
+            workline,
+            self.WD,
+            self.profiles,
+            self.prefix,
+            self.fastq,
+            resultsline,
+        )
         log.debug("Command ran: {}".format(cmd))
         proc = subprocess.Popen(cmd.split())
         out, err = proc.communicate()

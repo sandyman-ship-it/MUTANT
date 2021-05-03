@@ -13,7 +13,7 @@ Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
 * `git clone --recurse-submodules --branch main https://github.com/Clinical-Genomics/MUTANT.git`
 * `cd MUTANT && source setup.sh D_mutant` 
 * `source activate D_mutant`
-* `mutant toolbox sarscov2images` (This does currently not work on hasta. WORKAROUND: Use this command on another computer and transfer the generated img files)
+* `mutant toolbox create_images` (This does currently not work on hasta. WORKAROUND: Use this command on another computer and transfer the generated img files)
 
 ## Development
 
@@ -27,7 +27,8 @@ Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
 
 ### Self-test
 * `source activate D_mutant`
-* `mutant analyse sarscov2 tests/testdata/fasta_files --profiles local,singularity --config_artic mutant/config/local/artic.json --config_mutant mutant/config/local/mutant.json` 
+* `cd MUTANT`
+* `mutant analyse sarscov2 tests/testdata/fasta_files --profiles local,singularity --config_artic mutant/config/local/artic.json --config_mutant mutant/config/local/mutant.json --config_case tests/testdata/MIC3109_artic.json` 
 * Wait for pipeline completion (~3m). Check results in `./results/` 
 
 ### Version bumping
@@ -35,12 +36,6 @@ Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
 MUTANTs versioning is bumped manually post PR merge, using [semver](https://semver.org/) standards on [this](https://github.com/Clinical-Genomics/MUTANT/blob/main/mutant/__init__.py#L3) variable.
 
 ## Deploying new version
-
-* `INSTANCE='stage'` or `INSTANCE='production'`
-* `cd /home/proj/${INSTANCE}/mutant/MUTANT`
-* `git checkout main`
-* `git pull origin main`
-* `INITIAL="$(echo $INSTANCE | head -c 1)"`
-* `source activate ${INITIAL^}_mutant`
-* `pip install -e .`
-
+Determine if instance is either 'production' or stage.
+* `cd MUTANT`
+* `bash mutant/standalone/deploy_hasta_update.sh <INSTANCE>`
