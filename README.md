@@ -5,7 +5,7 @@ Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
 
 ### Prereq
 * Install Java 8 or above (`java --version`)
-* Install singularity (`conda install -c conda-forge singularity`)
+* Install singularity (`conda install -c conda-forge singularity`) [or `brew install singularity` on mac]
 * Install nextflow (`curl -s https://get.nextflow.io | bash`)
 * Path nextflow (`export PATH=$PATH:/MY/WORKING/DIR`)
 
