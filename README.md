@@ -13,7 +13,7 @@ Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
 * `git clone --recurse-submodules --branch main https://github.com/Clinical-Genomics/MUTANT.git`
 * `cd MUTANT && source setup.sh D_mutant` 
 * `source activate D_mutant`
-* `mutant toolbox create_images` (This does currently not work on hasta. WORKAROUND: Copy the *.sif images under /MUTANT/mutant/externals/gms-artic/*.sif)
+* `mutant toolbox create_images` (This does currently not work on hasta. WORKAROUND: Copy the *.sif images under `/MUTANT/mutant/externals/gms-artic/*.sif`)
 
 ## Development
 
