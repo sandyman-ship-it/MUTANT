@@ -6,7 +6,7 @@ INSTANCE=$1
 
 OLDDIR=pwd
 
-INSTANCE='stage' or INSTANCE='production'
+#INSTANCE='stage' or INSTANCE='production'
 cd /home/proj/${INSTANCE}/mutant/MUTANT
 git fetch
 git checkout main
