@@ -19,4 +19,4 @@ cd mutant/externals/gms-artic
 git fetch
 git checkout origin master
 git pull origin master
-cd $OLDDIR
+cd ${OLDDIR}
