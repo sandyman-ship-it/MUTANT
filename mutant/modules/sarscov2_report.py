@@ -214,7 +214,7 @@ class ReportSC2:
         """Parse artic output directory for analysis results. Returns dictionary data object"""
         indir = self.indir
         voc_pos = range(475, 486)
-        voc_pos_aa = ["L452R"]
+        voc_pos_aa = get_json("{0}/standalone/voc_strains.json".format(WD))['voc_pos_aa']
         voc_strains = get_json("{0}/standalone/voc_strains.json".format(WD))['voc_strains']
 
         artic_data = dict()
