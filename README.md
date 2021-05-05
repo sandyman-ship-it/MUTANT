@@ -31,7 +31,7 @@ Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
 * `mutant analyse sarscov2 tests/testdata/fasta_files --profiles local,singularity --config_artic mutant/config/local/artic.json --config_mutant mutant/config/local/mutant.json --config_case tests/testdata/MIC3109_artic.json` 
 * Wait for pipeline completion (~3m). Check results in `./results/` 
 
-Or install MUTANT under S_mutant and run `cg workflow mutant start frankhusky`
+Or install MUTANT under S_mutant and run `cg workflow mutant start frankhusky` with results in `/home/proj/stage/mutant/cases/frankhusky`
 
 ### Version bumping
 
