@@ -13,7 +13,7 @@ Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
 * `git clone --recurse-submodules --branch main https://github.com/Clinical-Genomics/MUTANT.git`
 * `cd MUTANT && source setup.sh D_mutant` 
 * `source activate D_mutant`
-* `mutant toolbox create_images` (This does currently not work on hasta. WORKAROUND: Copy the *.sif images under `/MUTANT/mutant/externals/gms-artic/*.sif`)
+* `mutant toolbox create_images` (This does currently not work on hasta. WORKAROUND: Copy the *.sif images under `MUTANT/mutant/externals/gms-artic/*.sif`)
 
 ## Development
 
@@ -30,6 +30,8 @@ Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
 * `cd MUTANT`
 * `mutant analyse sarscov2 tests/testdata/fasta_files --profiles local,singularity --config_artic mutant/config/local/artic.json --config_mutant mutant/config/local/mutant.json --config_case tests/testdata/MIC3109_artic.json` 
 * Wait for pipeline completion (~3m). Check results in `./results/` 
+
+Or install MUTANT under S_mutant and run `cg workflow mutant start frankhusky`
 
 ### Version bumping
 
