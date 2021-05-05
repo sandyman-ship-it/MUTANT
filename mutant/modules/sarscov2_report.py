@@ -344,7 +344,7 @@ class ReportSC2:
             {
                 "format": "csv",
                 "id": self.case,
-                "path": "{}/{}.sars-cov-2_{}_variants.csv".format(self.indir, self.ticket),
+                "path": "{}/sars-cov-2_{}_variants.csv".format(self.indir, self.ticket),
                 "path_index": "~",
                 "step": "report",
                 "tag": "ks-aux-results",
