@@ -67,13 +67,13 @@ class DeliverySC2:
         ## Rename case files
 
         # rename multiqc
-        hit = glob.glob("{}/multiqc/*_multiqc.html")
+        hit = glob.glob("{}/multiqc/*_multiqc.html".format(self.indir))
         if len(hit) == 1:
             hit = hit[0]
             os.symlink(hit, "{}/{}_multiqc.html".format(self.indir, self.ticket))
 
         # rename multiqc json
-        hit = glob.glob("{}/multiqc/*_multiqc_data/multiqc_data.json")
+        hit = glob.glob("{}/multiqc/*_multiqc_data/multiqc_data.json".format(self.indir))
         if len(hit) == 1:
             hit = hit[0]
             os.symlink(hit, "{}/{}_multiqc.json".format(self.indir, self.ticket))
