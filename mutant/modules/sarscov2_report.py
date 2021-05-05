@@ -206,7 +206,7 @@ class ReportSC2:
             sys.exit(-1)
 
         with open(
-            "{}/{}_artic".format(self.indir, self.ticket, self.today), "w"
+            "{}/{}_artic.json".format(self.indir, self.ticket, self.today), "w"
         ) as outfile:
             json.dump(self.articdata, outfile)
 
