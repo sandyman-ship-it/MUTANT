@@ -378,7 +378,7 @@ class ReportSC2:
         # Multiqc report
         deliv["files"].append(
             {
-                "format": "json",
+                "format": "html",
                 "id": self.case,
                 "path": "{}/{}_multiqc.html".format(self.indir, self.ticket),
                 "path_index": "~",
