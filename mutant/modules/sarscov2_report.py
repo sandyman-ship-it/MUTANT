@@ -366,7 +366,7 @@ class ReportSC2:
         # Consensus file
         deliv["files"].append(
             {
-                "format": "csv",
+                "format": "fasta",
                 "id": self.case,
                 "path": "{}/{}.consensus.fa".format(self.indir, self.ticket),
                 "path_index": "~",
