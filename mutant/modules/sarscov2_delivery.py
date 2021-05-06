@@ -37,6 +37,8 @@ class DeliverySC2:
     def rename_deliverables(self):
         """Rename result files for delivery: fastq, consensus files, vcf and pangolin"""
 
+        # Rename sample files
+
         for sampleinfo in self.caseinfo:
             sample = sampleinfo["CG_ID_sample"]
             region = sampleinfo["region_code"]
@@ -61,14 +63,28 @@ class DeliverySC2:
                 newpath = "{0}/{1}.vcf".format(prefix, base_sample)
                 os.symlink(item, newpath)
 
-            # rename core
-            core_suffix = [
-                ".qc.csv",
-                ".typing_summary.csv",
-                ".variant_summary.csv",
-            ]
-            for thing in core_suffix:
-                hit = glob.glob("{0}/*{1}".format(self.indir, thing))
-                if len(hit) == 1:
-                    hit = hit[0]
-                    os.symlink(hit, "{0}/{1}{2}".format(self.indir, self.ticket, thing))
+
+        ## Rename case files
+
+        # rename multiqc
+        hit = glob.glob("{}/multiqc/*_multiqc.html".format(self.indir))
+        if len(hit) == 1:
+            hit = hit[0]
+            os.symlink(hit, "{}/{}_multiqc.html".format(self.indir, self.ticket))
+
+        # rename multiqc json
+        hit = glob.glob("{}/multiqc/*_multiqc_data/multiqc_data.json".format(self.indir))
+        if len(hit) == 1:
+            hit = hit[0]
+            os.symlink(hit, "{}/{}_multiqc.json".format(self.indir, self.ticket))
+
+        core_suffix = [
+            ".qc.csv",
+            ".typing_summary.csv",
+            ".variant_summary.csv",
+        ]
+        for thing in core_suffix:
+            hit = glob.glob("{0}/*{1}".format(self.indir, thing))
+            if len(hit) == 1:
+                hit = hit[0]
+                os.symlink(hit, "{0}/{1}{2}".format(self.indir, self.ticket, thing))

@@ -138,7 +138,7 @@ class ReportSC2:
         indir = self.indir
 
         summaryfile = os.path.join(
-            indir, "sars-cov-2_{}_results_{}.csv".format(ticket, today)
+            indir, "sars-cov-2_{}_results.csv".format(ticket, today)
         )
         with open(summaryfile, mode="w") as out:
             summary = csv.writer(out)
@@ -182,7 +182,7 @@ class ReportSC2:
 
         varRep = glob.glob(os.path.join(indir, "*variant_summary.csv"))[0]
         varout = os.path.join(
-            indir, "sars-cov-2_{}_variants_{}.csv".format(ticket, today)
+            indir, "sars-cov-2_{}_variants.csv".format(ticket, today)
         )
         if os.stat(varRep).st_size != 0:
             with open(varRep) as f, open(varout, mode="w") as out:
@@ -206,7 +206,7 @@ class ReportSC2:
             sys.exit(-1)
 
         with open(
-            "{}/{}_{}".format(self.indir, self.ticket, self.today), "w"
+            "{}/{}_artic.json".format(self.indir, self.ticket, self.today), "w"
         ) as outfile:
             json.dump(self.articdata, outfile)
 
@@ -214,7 +214,7 @@ class ReportSC2:
         """Parse artic output directory for analysis results. Returns dictionary data object"""
         indir = self.indir
         voc_pos = range(475, 486)
-        voc_pos_aa = ["L452R"]
+        voc_pos_aa = get_json("{0}/standalone/voc_strains.json".format(WD))['voc_pos_aa']
         voc_strains = get_json("{0}/standalone/voc_strains.json".format(WD))['voc_strains']
 
         artic_data = dict()
@@ -326,53 +326,124 @@ class ReportSC2:
         deliv = {"files": []}
         delivfile = "{}/{}_deliverables.yaml".format(self.indir, self.case)
 
-        # Project-wide
+        ## Per Case
+        # KS Report
+        deliv["files"].append(
+            {
+                "format": "csv",
+                "id": self.case,
+                "path": "{}/sars-cov-2_{}_results.csv".format(self.indir, self.ticket),
+                "path_index": "~",
+                "step": "report",
+                "tag": "ks-results",
+            }
+        )
 
-        # Summary report
+        # KS Aux report
         deliv["files"].append(
             {
                 "format": "csv",
                 "id": self.case,
-                "path": "{}/{}.typing_summary.csv".format(self.indir, self.ticket),
+                "path": "{}/sars-cov-2_{}_variants.csv".format(self.indir, self.ticket),
                 "path_index": "~",
                 "step": "report",
-                "tag": "SARS-CoV-2-sum",
+                "tag": "ks-aux-results",
             }
         )
-        # Variant report
+
+        # Pangolin typing
         deliv["files"].append(
             {
                 "format": "csv",
                 "id": self.case,
-                "path": "{}/{}.variant_summary.csv".format(self.indir, self.ticket),
+                "path": "{}/{}.pangolin.csv".format(self.indir, self.ticket),
                 "path_index": "~",
                 "step": "report",
-                "tag": "SARS-CoV-2-var",
+                "tag": "pangolin-typing",
             }
         )
-        # QC report
+
+        # Consensus file
         deliv["files"].append(
             {
-                "format": "csv",
+                "format": "fasta",
                 "id": self.case,
-                "path": "{}/{}.qc.csv".format(self.indir, self.ticket),
+                "path": "{}/{}.consensus.fa".format(self.indir, self.ticket),
                 "path_index": "~",
-                "step": "result_aggregation",
-                "tag": "SARS-CoV-2-qc",
+                "step": "analysis",
+                "tag": "consensus",
             }
         )
-        # Json (vogue) data
+
+        # Multiqc report
+        deliv["files"].append(
+            {
+                "format": "html",
+                "id": self.case,
+                "path": "{}/{}_multiqc.html".format(self.indir, self.ticket),
+                "path_index": "~",
+                "step": "report",
+                "tag": "multiqc-html",
+            }
+        )
+        # MultiQC json (vogue)
         deliv["files"].append(
             {
                 "format": "json",
                 "id": self.case,
-                "path": "{}/{}.json".format(self.indir, self.case),
+                "path": "{}/{}_multiqc.json".format(self.indir, self.ticket),
                 "path_index": "~",
-                "step": "result_aggregation",
-                "tag": "SARS-CoV-2-json",
+                "step": "report",
+                "tag": "multiqc-json",
             }
         )
-        # Sampleinfo/Case
+ 
+        ## Artic Summary report
+        #deliv["files"].append(
+        #    {
+        #        "format": "csv",
+        #        "id": self.case,
+        #        "path": "{}/{}.typing_summary.csv".format(self.indir, self.ticket),
+        #        "path_index": "~",
+        #        "step": "report",
+        #        "tag": "artic-sum",
+        #    }
+        #)
+        ## Artic Variant report
+        #deliv["files"].append(
+        #    {
+        #        "format": "csv",
+        #        "id": self.case,
+        #        "path": "{}/{}.variant_summary.csv".format(self.indir, self.ticket),
+        #        "path_index": "~",
+        #        "step": "report",
+        #        "tag": "artic-var",
+        #    }
+        #)
+        ## Artic QC report
+        #deliv["files"].append(
+        #    {
+        #        "format": "csv",
+        #        "id": self.case,
+        #        "path": "{}/{}.qc.csv".format(self.indir, self.ticket),
+        #        "path_index": "~",
+        #        "step": "result_aggregation",
+        #        "tag": "artic-qc",
+        #    }
+        #)
+
+        # Artic Json (Vogue) data
+        deliv["files"].append(
+            {
+                "format": "json",
+                "id": self.case,
+                "path": "{}/{}_artic.json".format(self.indir, self.ticket),
+                "path_index": "~",
+                "step": "result_aggregation",
+                "tag": "artic-json",
+            }
+        )
+        # Provided CG CASE info from StatusDB
         deliv["files"].append(
             {
                 "format": "json",
@@ -383,7 +454,7 @@ class ReportSC2:
                 "tag": "sampleinfo",
             }
         )
-        # Settings dump
+        # Input settings dump
         deliv["files"].append(
             {
                 "format": "txt",
@@ -406,11 +477,10 @@ class ReportSC2:
             }
         )
 
-        # Region-lab-wide
-
+        # Region split
         for regionlab in self.regionlabs:
             rl = regionlab
-            # Pangolin reports
+            # Region split Pangolin typing
             deliv["files"].append(
                 {
                     "format": "csv",
@@ -424,7 +494,7 @@ class ReportSC2:
                     "tag": "SARS-CoV-2-type",
                 }
             )
-            # FoHM delivery file
+            # Region split FoHM delivery file
             deliv["files"].append(
                 {
                     "format": "csv",
@@ -438,8 +508,7 @@ class ReportSC2:
                 }
             )
 
-        # Sample-wide
-
+        # Per sample
         for record in self.caseinfo:
             sampleID = record["CG_ID_sample"]
             sample = record["Customer_ID_sample"]
@@ -470,57 +539,48 @@ class ReportSC2:
                     "tag": "reverse-reads",
                 }
             )
-            # Consensus files
-            deliv["files"].append(
-                {
-                    "format": "fasta",
-                    "id": sampleID,
-                    "path": "{}/ncovIllumina_sequenceAnalysis_makeConsensus/{}.consensus.fasta".format(
-                        self.indir, base_sample
-                    ),
-                    "path_index": "~",
-                    "step": "consensus",
-                    "tag": "consensus",
-                }
-            )
-            # Alignment (bam, sorted)
-            deliv["files"].append(
-                {
-                    "format": "bam",
-                    "id": sampleID,
-                    "path": "{}/ncovIllumina_sequenceAnalysis_readMapping/{}.sorted.bam".format(
-                        self.indir, base_sample
-                    ),
-                    "path_index": "~",
-                    "step": "alignment",
-                    "tag": "reference-alignment-sorted",
-                }
-            )
-            # Variants (csq-vcf)
-            deliv["files"].append(
-                {
-                    "format": "vcf",
-                    "id": sampleID,
-                    "path": "{}/ncovIllumina_Genotyping_typeVariants/vcf/{}.vcf".format(
-                        self.indir, base_sample
-                    ),
-                    "path_index": "~",
-                    "step": "genotyping",
-                    "tag": "variants",
-                }
-            )
-            # Variants (tsv)
-            deliv["files"].append(
-                {
-                    "format": "tsv",
-                    "id": sampleID,
-                    "path": "{}/ncovIllumina_sequenceAnalysis_callVariants/{}.variants.tsv".format(
-                        self.indir, base_sample
-                    ),
-                    "path_index": "~",
-                    "step": "variant-calling",
-                    "tag": "variants",
-                }
-            )
+
+            ## Commenting these to save space in CG. Can be reenabled dynamically
+
+            ## Alignment (bam, sorted)
+            #deliv["files"].append(
+            #    {
+            #        "format": "bam",
+            #        "id": sampleID,
+            #        "path": "{}/ncovIllumina_sequenceAnalysis_readMapping/{}.sorted.bam".format(
+            #            self.indir, base_sample
+            #        ),
+            #        "path_index": "~",
+            #        "step": "alignment",
+            #        "tag": "reference-alignment-sorted",
+            #    }
+            #)
+            ## Variants (csq-vcf)
+            #deliv["files"].append(
+            #    {
+            #        "format": "vcf",
+            #        "id": sampleID,
+            #        "path": "{}/ncovIllumina_Genotyping_typeVariants/vcf/{}.vcf".format(
+            #            self.indir, base_sample
+            #        ),
+            #        "path_index": "~",
+            #        "step": "genotyping",
+            #        "tag": "variants",
+            #    }
+            #)
+            ## Variants (tsv)
+            #deliv["files"].append(
+            #    {
+            #        "format": "tsv",
+            #        "id": sampleID,
+            #        "path": "{}/ncovIllumina_sequenceAnalysis_callVariants/{}.variants.tsv".format(
+            #            self.indir, base_sample
+            #        ),
+            #        "path_index": "~",
+            #        "step": "variant-calling",
+            #        "tag": "variants",
+            #    }
+            #)
+
         with open(delivfile, "w") as out:
             yaml.dump(deliv, out)
