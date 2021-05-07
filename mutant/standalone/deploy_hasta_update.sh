@@ -4,7 +4,7 @@ SCRIPT=$(readlink -f $0)
 scriptdir=`dirname $SCRIPT`
 INSTANCE=$1
 
-OLDDIR=pwd
+OLDDIR=$(pwd)
 
 if [ "$INSTANCE" != "production" ] && [ "$INSTANCE" != "stage" ]; then
     echo "Error: Please provide argument: production or stage"
