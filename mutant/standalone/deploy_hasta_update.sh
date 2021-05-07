@@ -6,6 +6,11 @@ INSTANCE=$1
 
 OLDDIR=pwd
 
+if [ "$INSTANCE" != "production" ] && [ "$INSTANCE" != "stage" ]; then
+    echo "Error: Please provide argument: production or stage"
+    exit 1
+fi
+
 #INSTANCE='stage' or INSTANCE='production'
 cd /home/proj/${INSTANCE}/mutant/MUTANT
 git fetch
