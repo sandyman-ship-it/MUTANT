@@ -2,7 +2,7 @@
 profiles {
     slurm {
         process.executor = 'slurm'
-        process.clusterOptions = { "-A production --qos low" }
+        process.clusterOptions = { "-A production --qos high" }
         process.time = '1h'
         process.memory = '8 GB'
         process.cpus = 4
