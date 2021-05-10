@@ -1,4 +1,6 @@
 # MUTANT
+[Current Version](https://github.com/Clinical-Genomics/MUTANT/blob/main/mutant/__init__.py#L5)
+
 Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
 
 ## Installation
