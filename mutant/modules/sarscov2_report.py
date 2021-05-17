@@ -7,6 +7,7 @@
 import csv
 import glob
 import json
+import pandas
 import re
 import os
 import sys
@@ -48,7 +49,7 @@ class ReportSC2:
         self.create_concat_consensus()
         self.create_deliveryfile()
         self.create_fohm_csv()
-        self.load_vanilla_artic_results()
+        self.load_lookup_dict()
         self.create_sarscov2_resultfile()
         self.create_sarscov2_variantfile()
         self.create_jsonfile()
@@ -134,7 +135,6 @@ class ReportSC2:
         if self.articdata == dict():
             print("No artic results loaded. Quitting sarscov2_resultfile")
             sys.exit(-1)
-        results = self.articdata
         indir = self.indir
 
         summaryfile = os.path.join(
@@ -153,14 +153,15 @@ class ReportSC2:
                     "Lineage",
                     "PangoLEARN_version",
                     "VOC",
-                    "Variants",
+                    "Mutations",
+                    "Region Code",
                 ]
             )
-            for sample, data in results.items():
+            for sample, data in self.articdata.items():
                 selection = "-"
                 row = [
                     sample,
-                    selection,
+                    data["selection_criteria"],
                     ticket,
                     data["pct_n_bases"],
                     data["pct_10X_bases"],
@@ -169,6 +170,7 @@ class ReportSC2:
                     data["pangoLEARN_version"],
                     data["VOC"],
                     data["VOC_aa"],
+                    data["region_code"],
                 ]
                 summary.writerow(row)
 
@@ -210,12 +212,45 @@ class ReportSC2:
         ) as outfile:
             json.dump(self.articdata, outfile)
 
-    def load_vanilla_artic_results(self):
-        """Parse artic output directory for analysis results. Returns dictionary data object"""
+
+
+    def load_lookup_dict(self):
+        """ Loads articdata with data from various sources. Atm, artic output and the case          config input file """
+        self.load_artic_results()
+        self.load_case_config()
+
+    def load_case_config(self):
+        """ Appends additional data to articdata dictionary """
+        casekeys = self.caseinfo[0].keys()
+
+        packing = dict(zip(casekeys, "-"*len(casekeys)))
+
+        #Packs with keys. Time consuming but not really
+        for k, v in self.articdata.items():
+            self.articdata[k].update(packing)
+        #Writes caseconfig data where relevant
+        for entry in self.caseinfo:
+            k = entry['Customer_ID_sample']
+            if k in self.articdata.keys():
+                self.articdata[k].update(entry)
+
+
+    def load_artic_results(self):
+        """Parse artic output directory for analysis results. Returns dictionary data object        """
         indir = self.indir
         voc_pos = range(475, 486)
-        voc_pos_aa = get_json("{0}/standalone/voc_strains.json".format(WD))['voc_pos_aa']
-        voc_strains = get_json("{0}/standalone/voc_strains.json".format(WD))['voc_strains']
+        muts = pandas.read_csv("{0}/standalone/spike_mutations.csv".format(WD), sep=",")
+        # Magical unpacking into single list
+        voc_pos_aa = sum(muts.values.tolist(), [])
+
+        classifications = pandas.read_csv("{0}/standalone/classifications.csv".format(WD), sep=",")
+        voc_strains = { 'lineage':'','spike':'','class':''}
+        voc_strains['lineage'] = classifications['lineage'].tolist()
+        voc_strains['spike'] = classifications['spike'].tolist()
+        voc_strains['class'] = classifications['class'].tolist()
+
+        #voc_pos_aa = get_json("{0}/standalone/voc_strains.json".format(WD))['voc_pos_aa']
+        #voc_strains = get_json("{0}/standalone/voc_strains.json".format(WD))['voc_strains']
 
         artic_data = dict()
         var_all = dict()
@@ -251,16 +286,16 @@ class ReportSC2:
             for line in content:
                 sample = line[0].split("_")[-1]
                 if float(line[2]) > 95:
-                    passed = "TRUE"
+                    qc_flag = "TRUE"
                 else:
-                    passed = "FALSE"
+                    qc_flag = "FALSE"
                 artic_data[sample] = {
                     "pct_n_bases": line[1],
                     "pct_10X_bases": line[2],
                     "longest_no_N_run": line[3],
                     "num_aligned_reads": line[4],
                     "artic_qc": line[7],
-                    "qc": passed,
+                    "qc": qc_flag,
                 }
         # Parse Pangolin report data
         with open(paths[2]) as f:
@@ -269,21 +304,16 @@ class ReportSC2:
             for line in content:
                 sample = line[0].split(".")[0].split("_")[-1]
                 lineage = line[1]
-                if lineage in voc_strains:
-                    voc = "Yes"
-                elif lineage == "None":
-                    voc = "-"
-                else:
-                    voc = "No"
+
                 artic_data[sample].update(
                     {
                         "lineage": lineage,
                         "pangolin_probability": line[2],
                         "pangoLEARN_version": line[3],
                         "pangolin_qc": line[4],
-                        "VOC": voc,
                     }
                 )
+
         # Parse Variant report data
         if os.stat(paths[1]).st_size != 0:
             with open(paths[1]) as f:
@@ -317,7 +347,23 @@ class ReportSC2:
                         artic_data[sample].update({"variants": var_all[sample]})
                 else:
                     artic_data[sample].update({"variants": "-"})
-        self.articdata = artic_data
+
+
+        #Classification
+        for key, vals in artic_data.items():
+            #Packing
+            artic_data[key].update( {"VOC": "No" } )
+
+            #Check for lineage
+            if artic_data[key]["lineage"] in voc_strains['lineage']:
+                index = voc_strains['lineage'].index(artic_data[key]['lineage'])
+                #Check for spike
+                if pandas.isna(voc_strains['spike'][index]) or voc_strains['spike'][index] in artic_data[key]['VOC_aa']:
+                    artic_data[key].update( {"VOC":voc_strains['class'][index]} )
+
+
+
+        self.articdata.update(artic_data)
 
     def create_deliveryfile(self):
 

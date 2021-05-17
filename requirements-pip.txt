@@ -1,3 +1,4 @@
 black
 click==7.1.2
+pandas
 pyyaml
