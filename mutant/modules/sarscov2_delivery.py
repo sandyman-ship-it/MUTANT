@@ -55,13 +55,19 @@ class DeliverySC2:
             )
             for item in glob.glob("{0}/{1}.*".format(prefix, base_sample)):
                 newpath = "{0}/{1}.consensus.fasta".format(prefix, base_sample)
-                os.symlink(item, newpath)
+                try: 
+                    os.symlink(item, newpath)
+                except Exception as e:
+                    pass
 
             # rename typeVariants
             prefix = "{0}/ncovIllumina_Genotyping_typeVariants/vcf".format(self.indir)
             for item in glob.glob("{0}/{1}.csq.vcf".format(prefix, base_sample)):
                 newpath = "{0}/{1}.vcf".format(prefix, base_sample)
-                os.symlink(item, newpath)
+                try: 
+                    os.symlink(item, newpath)
+                except Exception as e:
+                    pass
 
 
         ## Rename case files
@@ -70,13 +76,20 @@ class DeliverySC2:
         hit = glob.glob("{}/multiqc/*_multiqc.html".format(self.indir))
         if len(hit) == 1:
             hit = hit[0]
-            os.symlink(hit, "{}/{}_multiqc.html".format(self.indir, self.ticket))
+            try: 
+                os.symlink(hit, "{}/{}_multiqc.html".format(self.indir, self.ticket))
+            except Exception as e:
+                pass
 
         # rename multiqc json
         hit = glob.glob("{}/multiqc/*_multiqc_data/multiqc_data.json".format(self.indir))
         if len(hit) == 1:
             hit = hit[0]
-            os.symlink(hit, "{}/{}_multiqc.json".format(self.indir, self.ticket))
+            try: 
+                os.symlink(hit, "{}/{}_multiqc.json".format(self.indir, self.ticket))
+            except Exception as e:
+                pass
+          
 
         core_suffix = [
             ".qc.csv",
@@ -87,4 +100,7 @@ class DeliverySC2:
             hit = glob.glob("{0}/*{1}".format(self.indir, thing))
             if len(hit) == 1:
                 hit = hit[0]
-                os.symlink(hit, "{0}/{1}{2}".format(self.indir, self.ticket, thing))
+                try: 
+                    os.symlink(hit, "{0}/{1}{2}".format(self.indir, self.ticket, thing))
+                except Exception as e:
+                    pass
