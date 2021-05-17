@@ -355,7 +355,9 @@ class ReportSC2:
             artic_data[key].update( {"VOC": "No" } )
 
             #Check for lineage
-            if artic_data[key]["lineage"] in voc_strains['lineage']:
+            if artic_data[key]["lineage"] == "None":
+                artic_data[key].update( {"VOC":"-"})
+            elif artic_data[key]["lineage"] in voc_strains['lineage']:
                 index = voc_strains['lineage'].index(artic_data[key]['lineage'])
                 #Check for spike
                 if pandas.isna(voc_strains['spike'][index]) or voc_strains['spike'][index] in artic_data[key]['VOC_aa']:
