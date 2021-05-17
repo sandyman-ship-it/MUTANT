@@ -146,6 +146,7 @@ class ReportSC2:
                 [
                     "Sample",
                     "Selection",
+                    "Region Code",
                     "Ticket",
                     "%N_bases",
                     "%10X_coverage",
@@ -154,7 +155,7 @@ class ReportSC2:
                     "PangoLEARN_version",
                     "VOC",
                     "Mutations",
-                    "Region Code",
+
                 ]
             )
             for sample, data in self.articdata.items():
@@ -162,6 +163,7 @@ class ReportSC2:
                 row = [
                     sample,
                     data["selection_criteria"],
+                    data["region_code"],
                     ticket,
                     data["pct_n_bases"],
                     data["pct_10X_bases"],
@@ -170,7 +172,7 @@ class ReportSC2:
                     data["pangoLEARN_version"],
                     data["VOC"],
                     data["VOC_aa"],
-                    data["region_code"],
+
                 ]
                 summary.writerow(row)
 
