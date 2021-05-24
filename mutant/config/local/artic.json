@@ -11,6 +11,9 @@ process {
     withLabel: largecpu {
         cpus = 4
     }
+    withLabel: largemem {
+        memory = '12 GB'
+    }
 }
 
 // Load base.config by default for all pipelines
@@ -84,6 +87,12 @@ if ( params.illumina ) {
         csqAfThreshold = 0.75
         // Minimum coverage depth to call aa consequences of variant. Set to ivarMinDepth for consistency with consensus
         csqDpThreshold = 10
+        // Java settings for picard tools. The "-Xmx" setting is useful if running into java memory issues
+        picardJavaSettings = ""
+        // Options for picard CollectWgsMetrics
+        wgsMetricsOptions = "--COVERAGE_CAP 10000 --LOCUS_ACCUMULATION_CAP 100000"
+        // Customization of multiQC report
+        multiqcOptions = '--cl_config "picard_config: { general_stats_target_coverage: [10,30,50,100] }"'
     }
 }
 
